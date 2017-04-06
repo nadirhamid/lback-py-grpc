@@ -36,17 +36,17 @@ class Server(server_pb2_grpc.ServerServicer):
     except Exception,ex:
        yield server_pb2.BackupCmdStatus(errored=True)
 
-  def RouteMv(self, request, context):  
+  def RouteRelocate(self, request, context):  
      src_agent = self._GetAgent( request.src )
      dst_agent = self._GetAgent( request.dst )
      def chunked_iterator():
-          for mv_cmd_chunk in  src_agent.DoMvTake( request ):
-	   	yield mv_cmd_chunk
+          for relocate_cmd_chunk in  src_agent.DoRelocateTake( request ):
+	   	yield relocate_cmd_chunk
      try:
-	  mv_cmd_status = dst_agent.DoMvGive( chunked_iterator )
+	  relocate_cmd_status = dst_agent.DoRelocateGive( chunked_iterator )
      except Exception,ex:
-	  return server_pb2.MvCmdStatus(errored=True)
-     return server_pb2.MvCmdStatus(errored=False)
+	  return server_pb2.RelocateCmdStatus(errored=True)
+     return server_pb2.RelocateCmdStatus(errored=False)
 	 
   def RouteRestore(self, request, context):
      dst_agent = self.GetRestoreCandidate()

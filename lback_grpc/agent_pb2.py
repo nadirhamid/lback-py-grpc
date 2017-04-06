@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='agent.proto',
   package='lbackgrpc',
   syntax='proto3',
-  serialized_pb=_b('\n\x0b\x61gent.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\xd2\x02\n\x05\x41gent\x12\x46\n\x08\x44oBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12@\n\x08\x44oMvTake\x12\x14.lbackgrpc.MvCmdTake\x1a\x1a.lbackgrpc.MvCmdTakeStatus\"\x00\x30\x01\x12\x46\n\x08\x44oMvGive\x12\x1a.lbackgrpc.MvCmdGiveStream\x1a\x1a.lbackgrpc.MvCmdGiveStatus\"\x00(\x01\x12\x43\n\tDoRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x30\x01\x12\x32\n\x04\x44oRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x42\x1d\n\x12io.grpc.lback.grpcB\x05\x41gentP\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0b\x61gent.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\xf6\x02\n\x05\x41gent\x12\x46\n\x08\x44oBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12R\n\x0e\x44oRelocateTake\x12\x1a.lbackgrpc.RelocateCmdTake\x1a .lbackgrpc.RelocateCmdTakeStatus\"\x00\x30\x01\x12X\n\x0e\x44oRelocateGive\x12 .lbackgrpc.RelocateCmdGiveStream\x1a .lbackgrpc.RelocateCmdGiveStatus\"\x00(\x01\x12\x43\n\tDoRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x30\x01\x12\x32\n\x04\x44oRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x42\x1d\n\x12io.grpc.lback.grpcB\x05\x41gentP\x01\x62\x06proto3')
   ,
   dependencies=[shared__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -56,15 +56,15 @@ try:
           request_serializer=shared__pb2.BackupCmdStream.SerializeToString,
           response_deserializer=shared__pb2.BackupCmdStatus.FromString,
           )
-      self.DoMvTake = channel.unary_stream(
-          '/lbackgrpc.Agent/DoMvTake',
-          request_serializer=shared__pb2.MvCmdTake.SerializeToString,
-          response_deserializer=shared__pb2.MvCmdTakeStatus.FromString,
+      self.DoRelocateTake = channel.unary_stream(
+          '/lbackgrpc.Agent/DoRelocateTake',
+          request_serializer=shared__pb2.RelocateCmdTake.SerializeToString,
+          response_deserializer=shared__pb2.RelocateCmdTakeStatus.FromString,
           )
-      self.DoMvGive = channel.stream_unary(
-          '/lbackgrpc.Agent/DoMvGive',
-          request_serializer=shared__pb2.MvCmdGiveStream.SerializeToString,
-          response_deserializer=shared__pb2.MvCmdGiveStatus.FromString,
+      self.DoRelocateGive = channel.stream_unary(
+          '/lbackgrpc.Agent/DoRelocateGive',
+          request_serializer=shared__pb2.RelocateCmdGiveStream.SerializeToString,
+          response_deserializer=shared__pb2.RelocateCmdGiveStatus.FromString,
           )
       self.DoRestore = channel.unary_stream(
           '/lbackgrpc.Agent/DoRestore',
@@ -87,12 +87,12 @@ try:
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
-    def DoMvTake(self, request, context):
+    def DoRelocateTake(self, request, context):
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
-    def DoMvGive(self, request_iterator, context):
+    def DoRelocateGive(self, request_iterator, context):
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
@@ -115,15 +115,15 @@ try:
             request_deserializer=shared__pb2.BackupCmdStream.FromString,
             response_serializer=shared__pb2.BackupCmdStatus.SerializeToString,
         ),
-        'DoMvTake': grpc.unary_stream_rpc_method_handler(
-            servicer.DoMvTake,
-            request_deserializer=shared__pb2.MvCmdTake.FromString,
-            response_serializer=shared__pb2.MvCmdTakeStatus.SerializeToString,
+        'DoRelocateTake': grpc.unary_stream_rpc_method_handler(
+            servicer.DoRelocateTake,
+            request_deserializer=shared__pb2.RelocateCmdTake.FromString,
+            response_serializer=shared__pb2.RelocateCmdTakeStatus.SerializeToString,
         ),
-        'DoMvGive': grpc.stream_unary_rpc_method_handler(
-            servicer.DoMvGive,
-            request_deserializer=shared__pb2.MvCmdGiveStream.FromString,
-            response_serializer=shared__pb2.MvCmdGiveStatus.SerializeToString,
+        'DoRelocateGive': grpc.stream_unary_rpc_method_handler(
+            servicer.DoRelocateGive,
+            request_deserializer=shared__pb2.RelocateCmdGiveStream.FromString,
+            response_serializer=shared__pb2.RelocateCmdGiveStatus.SerializeToString,
         ),
         'DoRestore': grpc.unary_stream_rpc_method_handler(
             servicer.DoRestore,
@@ -151,9 +151,9 @@ try:
     """
     def DoBackup(self, request_iterator, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
-    def DoMvTake(self, request, context):
+    def DoRelocateTake(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
-    def DoMvGive(self, request_iterator, context):
+    def DoRelocateGive(self, request_iterator, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def DoRestore(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
@@ -172,11 +172,11 @@ try:
     def DoBackup(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     DoBackup.future = None
-    def DoMvTake(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+    def DoRelocateTake(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
-    def DoMvGive(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
+    def DoRelocateGive(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
-    DoMvGive.future = None
+    DoRelocateGive.future = None
     def DoRestore(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     def DoRm(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
@@ -192,22 +192,22 @@ try:
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_deserializers = {
       ('lbackgrpc.Agent', 'DoBackup'): shared__pb2.BackupCmdStream.FromString,
-      ('lbackgrpc.Agent', 'DoMvGive'): shared__pb2.MvCmdGiveStream.FromString,
-      ('lbackgrpc.Agent', 'DoMvTake'): shared__pb2.MvCmdTake.FromString,
+      ('lbackgrpc.Agent', 'DoRelocateGive'): shared__pb2.RelocateCmdGiveStream.FromString,
+      ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTake.FromString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmd.FromString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmd.FromString,
     }
     response_serializers = {
       ('lbackgrpc.Agent', 'DoBackup'): shared__pb2.BackupCmdStatus.SerializeToString,
-      ('lbackgrpc.Agent', 'DoMvGive'): shared__pb2.MvCmdGiveStatus.SerializeToString,
-      ('lbackgrpc.Agent', 'DoMvTake'): shared__pb2.MvCmdTakeStatus.SerializeToString,
+      ('lbackgrpc.Agent', 'DoRelocateGive'): shared__pb2.RelocateCmdGiveStatus.SerializeToString,
+      ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTakeStatus.SerializeToString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmdStatus.SerializeToString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmdStatus.SerializeToString,
     }
     method_implementations = {
       ('lbackgrpc.Agent', 'DoBackup'): face_utilities.stream_unary_inline(servicer.DoBackup),
-      ('lbackgrpc.Agent', 'DoMvGive'): face_utilities.stream_unary_inline(servicer.DoMvGive),
-      ('lbackgrpc.Agent', 'DoMvTake'): face_utilities.unary_stream_inline(servicer.DoMvTake),
+      ('lbackgrpc.Agent', 'DoRelocateGive'): face_utilities.stream_unary_inline(servicer.DoRelocateGive),
+      ('lbackgrpc.Agent', 'DoRelocateTake'): face_utilities.unary_stream_inline(servicer.DoRelocateTake),
       ('lbackgrpc.Agent', 'DoRestore'): face_utilities.unary_stream_inline(servicer.DoRestore),
       ('lbackgrpc.Agent', 'DoRm'): face_utilities.unary_unary_inline(servicer.DoRm),
     }
@@ -223,22 +223,22 @@ try:
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_serializers = {
       ('lbackgrpc.Agent', 'DoBackup'): shared__pb2.BackupCmdStream.SerializeToString,
-      ('lbackgrpc.Agent', 'DoMvGive'): shared__pb2.MvCmdGiveStream.SerializeToString,
-      ('lbackgrpc.Agent', 'DoMvTake'): shared__pb2.MvCmdTake.SerializeToString,
+      ('lbackgrpc.Agent', 'DoRelocateGive'): shared__pb2.RelocateCmdGiveStream.SerializeToString,
+      ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTake.SerializeToString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmd.SerializeToString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmd.SerializeToString,
     }
     response_deserializers = {
       ('lbackgrpc.Agent', 'DoBackup'): shared__pb2.BackupCmdStatus.FromString,
-      ('lbackgrpc.Agent', 'DoMvGive'): shared__pb2.MvCmdGiveStatus.FromString,
-      ('lbackgrpc.Agent', 'DoMvTake'): shared__pb2.MvCmdTakeStatus.FromString,
+      ('lbackgrpc.Agent', 'DoRelocateGive'): shared__pb2.RelocateCmdGiveStatus.FromString,
+      ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTakeStatus.FromString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmdStatus.FromString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmdStatus.FromString,
     }
     cardinalities = {
       'DoBackup': cardinality.Cardinality.STREAM_UNARY,
-      'DoMvGive': cardinality.Cardinality.STREAM_UNARY,
-      'DoMvTake': cardinality.Cardinality.UNARY_STREAM,
+      'DoRelocateGive': cardinality.Cardinality.STREAM_UNARY,
+      'DoRelocateTake': cardinality.Cardinality.UNARY_STREAM,
       'DoRestore': cardinality.Cardinality.UNARY_STREAM,
       'DoRm': cardinality.Cardinality.UNARY_UNARY,
     }

@@ -5,13 +5,14 @@ from lback.utils
 from lback.operation_backup import OperationBackup
 from lback.operation_restore import OperationRestore
 from lback.operation_mv import OperationMv
+from lback.operation_relocate import OperationRelocate
 from lback.operation_rm import OperationRm
 from lback.restore import Restore, RestoreException
 
 class Client( object ):
 	def __init__(self):
-		self.channel = grpc.InsecureChannel("localhost:4500")
-		self.server =  server_pb2_grpc.ServerStub()
+		channel = grpc.InsecureChannel("localhost:4500")
+		self.server =  server_pb2_grpc.ServerStub( channel )
 	def _run( self, operation_instance ):
 	    id = operation_instance.get_id()
 	    if isinstance(operation_instance, OperationBackup ):
@@ -30,16 +31,16 @@ class Client( object ):
 		    lback_output("RESTORE successful")
 		else:
 		    lback_output("RESTORE could not be performed")
-	    elif isinstance(operation_instance, OperationMv ):
-		 reply = self.server.RouteMv( 
-			 server_pb2.MvCmd( 
+	    elif isinstance(operation_instance, OperationRelocate ):
+		 reply = self.server.RouteRelocate( 
+			 server_pb2.RelocateCmd( 
 				id=id,
 				src=operation_instance.get_arg("src"),
 				dst=operation_instance.get_arg("dst") ) )
 		 if not not reply.errored:
-		    lback_output("MOVE successful")
+		    lback_output("RELOCATE successful")
 		 else:
-		    lback_output("MOVE could not be performed")
+		    lback_output("RELOCATE could not be performed")
 	    elif isinstance(operation_instance, OperationRm ):
 		 is_all = operation_instance.get_arg("all")
 		 if is_all:

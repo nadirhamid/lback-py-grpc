@@ -1,5 +1,5 @@
 from lback.backup import Backup
-from lback.utils import lback_backup, lback_backup_file_chunks, lback_backup_remove
+from lback.utils import lback_backup, lback_backup_chunked_file, lback_backup_remove
 import agent_pb2
 import agent_pb2_grpc
 from itertools import tee
@@ -20,25 +20,25 @@ class Agent(agent_pb2_grpc.AgentServicer):
 	return agent_pb2.BackupCmdStatus( errored=True )
     return agent_pb2.BackupCmdStatus( errored=False )
 
-  def DoMvTake(self, request, context):
+  def DoRelocateTake(self, request, context):
      try:
 	for file_chunk_res in lback_backup_file_chunks( request.id ):
-	    yield agent_pb2.MvCmdGiveStatus( raw_data=file_chunk_res, errored=False)
+	    yield agent_pb2.RelocateCmdGiveStatus( raw_data=file_chunk_res, errored=False)
      except Exception,ex:
-         return agent_pb2.MvCmdGiveStatus( errored=True )
-  def DoMvGive(self, request_iterator, context):
+         return agent_pb2.RelocateCmdGiveStatus( errored=True )
+  def DoRelocateGive(self, request_iterator, context):
     iter_copy = tee( request_iterator )
     request = iter_copy()
     db_backup =lback_backup( request.id )
     backup = Backup( request.id, db_backup['folder'] )
-    def mv_cmd_chunked_iterator():
-	 for mv_cmd_chunk in request_iterator():
-	      yield mv_cmd_chunk.raw_data
+    def relocate_cmd_chunked_iterator():
+	 for relocate_cmd_chunk in request_iterator():
+	      yield relocate_cmd_chunk.raw_data
     try:
-        for mv_chunk_res in backup.run_chunked( mv_chunked_iterator ):
-	    yield agent_pb2.MvCmdStatus(errored=False)
+        for relocate_chunk_res in backup.run_chunked( relocate_chunked_iterator ):
+	    yield agent_pb2.RelocateCmdStatus(errored=False)
     except Exception,ex:
-	 return agent_pb2.MvCmdStatus(errored=True )
+	 return agent_pb2.RelocateCmdStatus(errored=True )
 
   def DoRestore(self, request, context):
     db_backup =lback_backup( request.id )

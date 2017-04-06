@@ -55,32 +55,32 @@ message RestoreCmdStatus {
   string raw_data = 2;
   bool errored = 3;
 }
-message MvCmd {
+message RelocateCmd {
   // The location from which the message is sent.
   string id = 1;
   string src = 2;
   string dst = 3;
 }
 
-message MvCmdTake {
+message RelocateCmdTake {
   string id = 1;
 }
 
-message MvCmdGiveStream {
+message RelocateCmdGiveStream {
   // The location from which the message is sent.
   string id = 1;
   string raw_data = 2;
 }
-message MvCmdStatus {
+message RelocateCmdStatus {
   int32 elapsed_time = 1;
 }
 
-message MvCmdTakeStatus {
+message RelocateCmdTakeStatus {
   int32 elapsed_time = 1;
   bool errored  = 2;
 }
 
-message MvCmdGiveStatus {
+message RelocateCmdGiveStatus {
   // The location from which the message is sent.
   bool errored = 1;
 }

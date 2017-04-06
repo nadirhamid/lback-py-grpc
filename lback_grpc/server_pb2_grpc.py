@@ -21,10 +21,10 @@ class ServerStub(object):
         request_serializer=shared__pb2.BackupCmd.SerializeToString,
         response_deserializer=shared__pb2.BackupCmdStatus.FromString,
         )
-    self.RouteMv = channel.unary_unary(
-        '/lbackgrpc.Server/RouteMv',
-        request_serializer=shared__pb2.MvCmd.SerializeToString,
-        response_deserializer=shared__pb2.MvCmdStatus.FromString,
+    self.RouteRelocate = channel.unary_unary(
+        '/lbackgrpc.Server/RouteRelocate',
+        request_serializer=shared__pb2.RelocateCmd.SerializeToString,
+        response_deserializer=shared__pb2.RelocateCmdStatus.FromString,
         )
     self.RouteRestore = channel.unary_unary(
         '/lbackgrpc.Server/RouteRestore',
@@ -52,7 +52,7 @@ class ServerServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def RouteMv(self, request, context):
+  def RouteRelocate(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -75,10 +75,10 @@ def add_ServerServicer_to_server(servicer, server):
           request_deserializer=shared__pb2.BackupCmd.FromString,
           response_serializer=shared__pb2.BackupCmdStatus.SerializeToString,
       ),
-      'RouteMv': grpc.unary_unary_rpc_method_handler(
-          servicer.RouteMv,
-          request_deserializer=shared__pb2.MvCmd.FromString,
-          response_serializer=shared__pb2.MvCmdStatus.SerializeToString,
+      'RouteRelocate': grpc.unary_unary_rpc_method_handler(
+          servicer.RouteRelocate,
+          request_deserializer=shared__pb2.RelocateCmd.FromString,
+          response_serializer=shared__pb2.RelocateCmdStatus.SerializeToString,
       ),
       'RouteRestore': grpc.unary_unary_rpc_method_handler(
           servicer.RouteRestore,

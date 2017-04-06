@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='server.proto',
   package='lbackgrpc',
   syntax='proto3',
-  serialized_pb=_b('\n\x0cserver.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\x81\x02\n\x06Server\x12\x41\n\x0bRouteBackup\x12\x14.lbackgrpc.BackupCmd\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00\x12\x35\n\x07RouteMv\x12\x10.lbackgrpc.MvCmd\x1a\x16.lbackgrpc.MvCmdStatus\"\x00\x12\x44\n\x0cRouteRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x12\x37\n\x07RouteRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x30\x01\x42\x1e\n\x12io.grpc.lback.grpcB\x06ServerP\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0cserver.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\x93\x02\n\x06Server\x12\x41\n\x0bRouteBackup\x12\x14.lbackgrpc.BackupCmd\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00\x12G\n\rRouteRelocate\x12\x16.lbackgrpc.RelocateCmd\x1a\x1c.lbackgrpc.RelocateCmdStatus\"\x00\x12\x44\n\x0cRouteRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x12\x37\n\x07RouteRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x30\x01\x42\x1e\n\x12io.grpc.lback.grpcB\x06ServerP\x01\x62\x06proto3')
   ,
   dependencies=[shared__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -56,10 +56,10 @@ try:
           request_serializer=shared__pb2.BackupCmd.SerializeToString,
           response_deserializer=shared__pb2.BackupCmdStatus.FromString,
           )
-      self.RouteMv = channel.unary_unary(
-          '/lbackgrpc.Server/RouteMv',
-          request_serializer=shared__pb2.MvCmd.SerializeToString,
-          response_deserializer=shared__pb2.MvCmdStatus.FromString,
+      self.RouteRelocate = channel.unary_unary(
+          '/lbackgrpc.Server/RouteRelocate',
+          request_serializer=shared__pb2.RelocateCmd.SerializeToString,
+          response_deserializer=shared__pb2.RelocateCmdStatus.FromString,
           )
       self.RouteRestore = channel.unary_unary(
           '/lbackgrpc.Server/RouteRestore',
@@ -87,7 +87,7 @@ try:
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
-    def RouteMv(self, request, context):
+    def RouteRelocate(self, request, context):
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
@@ -110,10 +110,10 @@ try:
             request_deserializer=shared__pb2.BackupCmd.FromString,
             response_serializer=shared__pb2.BackupCmdStatus.SerializeToString,
         ),
-        'RouteMv': grpc.unary_unary_rpc_method_handler(
-            servicer.RouteMv,
-            request_deserializer=shared__pb2.MvCmd.FromString,
-            response_serializer=shared__pb2.MvCmdStatus.SerializeToString,
+        'RouteRelocate': grpc.unary_unary_rpc_method_handler(
+            servicer.RouteRelocate,
+            request_deserializer=shared__pb2.RelocateCmd.FromString,
+            response_serializer=shared__pb2.RelocateCmdStatus.SerializeToString,
         ),
         'RouteRestore': grpc.unary_unary_rpc_method_handler(
             servicer.RouteRestore,
@@ -146,7 +146,7 @@ try:
       while receiving other RouteNotes (e.g. from other users).
       """
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
-    def RouteMv(self, request, context):
+    def RouteRelocate(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def RouteRestore(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
@@ -170,9 +170,9 @@ try:
       """
       raise NotImplementedError()
     RouteBackup.future = None
-    def RouteMv(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+    def RouteRelocate(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
-    RouteMv.future = None
+    RouteRelocate.future = None
     def RouteRestore(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     RouteRestore.future = None
@@ -188,19 +188,19 @@ try:
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_deserializers = {
       ('lbackgrpc.Server', 'RouteBackup'): shared__pb2.BackupCmd.FromString,
-      ('lbackgrpc.Server', 'RouteMv'): shared__pb2.MvCmd.FromString,
+      ('lbackgrpc.Server', 'RouteRelocate'): shared__pb2.RelocateCmd.FromString,
       ('lbackgrpc.Server', 'RouteRestore'): shared__pb2.RestoreCmd.FromString,
       ('lbackgrpc.Server', 'RouteRm'): shared__pb2.RmCmd.FromString,
     }
     response_serializers = {
       ('lbackgrpc.Server', 'RouteBackup'): shared__pb2.BackupCmdStatus.SerializeToString,
-      ('lbackgrpc.Server', 'RouteMv'): shared__pb2.MvCmdStatus.SerializeToString,
+      ('lbackgrpc.Server', 'RouteRelocate'): shared__pb2.RelocateCmdStatus.SerializeToString,
       ('lbackgrpc.Server', 'RouteRestore'): shared__pb2.RestoreCmdStatus.SerializeToString,
       ('lbackgrpc.Server', 'RouteRm'): shared__pb2.RmCmdStatus.SerializeToString,
     }
     method_implementations = {
       ('lbackgrpc.Server', 'RouteBackup'): face_utilities.unary_unary_inline(servicer.RouteBackup),
-      ('lbackgrpc.Server', 'RouteMv'): face_utilities.unary_unary_inline(servicer.RouteMv),
+      ('lbackgrpc.Server', 'RouteRelocate'): face_utilities.unary_unary_inline(servicer.RouteRelocate),
       ('lbackgrpc.Server', 'RouteRestore'): face_utilities.unary_unary_inline(servicer.RouteRestore),
       ('lbackgrpc.Server', 'RouteRm'): face_utilities.unary_stream_inline(servicer.RouteRm),
     }
@@ -216,19 +216,19 @@ try:
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_serializers = {
       ('lbackgrpc.Server', 'RouteBackup'): shared__pb2.BackupCmd.SerializeToString,
-      ('lbackgrpc.Server', 'RouteMv'): shared__pb2.MvCmd.SerializeToString,
+      ('lbackgrpc.Server', 'RouteRelocate'): shared__pb2.RelocateCmd.SerializeToString,
       ('lbackgrpc.Server', 'RouteRestore'): shared__pb2.RestoreCmd.SerializeToString,
       ('lbackgrpc.Server', 'RouteRm'): shared__pb2.RmCmd.SerializeToString,
     }
     response_deserializers = {
       ('lbackgrpc.Server', 'RouteBackup'): shared__pb2.BackupCmdStatus.FromString,
-      ('lbackgrpc.Server', 'RouteMv'): shared__pb2.MvCmdStatus.FromString,
+      ('lbackgrpc.Server', 'RouteRelocate'): shared__pb2.RelocateCmdStatus.FromString,
       ('lbackgrpc.Server', 'RouteRestore'): shared__pb2.RestoreCmdStatus.FromString,
       ('lbackgrpc.Server', 'RouteRm'): shared__pb2.RmCmdStatus.FromString,
     }
     cardinalities = {
       'RouteBackup': cardinality.Cardinality.UNARY_UNARY,
-      'RouteMv': cardinality.Cardinality.UNARY_UNARY,
+      'RouteRelocate': cardinality.Cardinality.UNARY_UNARY,
       'RouteRestore': cardinality.Cardinality.UNARY_UNARY,
       'RouteRm': cardinality.Cardinality.UNARY_STREAM,
     }

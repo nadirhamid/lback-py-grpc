@@ -21,15 +21,15 @@ class AgentStub(object):
         request_serializer=shared__pb2.BackupCmdStream.SerializeToString,
         response_deserializer=shared__pb2.BackupCmdStatus.FromString,
         )
-    self.DoMvTake = channel.unary_stream(
-        '/lbackgrpc.Agent/DoMvTake',
-        request_serializer=shared__pb2.MvCmdTake.SerializeToString,
-        response_deserializer=shared__pb2.MvCmdTakeStatus.FromString,
+    self.DoRelocateTake = channel.unary_stream(
+        '/lbackgrpc.Agent/DoRelocateTake',
+        request_serializer=shared__pb2.RelocateCmdTake.SerializeToString,
+        response_deserializer=shared__pb2.RelocateCmdTakeStatus.FromString,
         )
-    self.DoMvGive = channel.stream_unary(
-        '/lbackgrpc.Agent/DoMvGive',
-        request_serializer=shared__pb2.MvCmdGiveStream.SerializeToString,
-        response_deserializer=shared__pb2.MvCmdGiveStatus.FromString,
+    self.DoRelocateGive = channel.stream_unary(
+        '/lbackgrpc.Agent/DoRelocateGive',
+        request_serializer=shared__pb2.RelocateCmdGiveStream.SerializeToString,
+        response_deserializer=shared__pb2.RelocateCmdGiveStatus.FromString,
         )
     self.DoRestore = channel.unary_stream(
         '/lbackgrpc.Agent/DoRestore',
@@ -52,12 +52,12 @@ class AgentServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def DoMvTake(self, request, context):
+  def DoRelocateTake(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def DoMvGive(self, request_iterator, context):
+  def DoRelocateGive(self, request_iterator, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -80,15 +80,15 @@ def add_AgentServicer_to_server(servicer, server):
           request_deserializer=shared__pb2.BackupCmdStream.FromString,
           response_serializer=shared__pb2.BackupCmdStatus.SerializeToString,
       ),
-      'DoMvTake': grpc.unary_stream_rpc_method_handler(
-          servicer.DoMvTake,
-          request_deserializer=shared__pb2.MvCmdTake.FromString,
-          response_serializer=shared__pb2.MvCmdTakeStatus.SerializeToString,
+      'DoRelocateTake': grpc.unary_stream_rpc_method_handler(
+          servicer.DoRelocateTake,
+          request_deserializer=shared__pb2.RelocateCmdTake.FromString,
+          response_serializer=shared__pb2.RelocateCmdTakeStatus.SerializeToString,
       ),
-      'DoMvGive': grpc.stream_unary_rpc_method_handler(
-          servicer.DoMvGive,
-          request_deserializer=shared__pb2.MvCmdGiveStream.FromString,
-          response_serializer=shared__pb2.MvCmdGiveStatus.SerializeToString,
+      'DoRelocateGive': grpc.stream_unary_rpc_method_handler(
+          servicer.DoRelocateGive,
+          request_deserializer=shared__pb2.RelocateCmdGiveStream.FromString,
+          response_serializer=shared__pb2.RelocateCmdGiveStatus.SerializeToString,
       ),
       'DoRestore': grpc.unary_stream_rpc_method_handler(
           servicer.DoRestore,
