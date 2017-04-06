@@ -1,7 +1,7 @@
 import grpc
-import agent_pb2_grpc
-import server_pb2
-import server_pb2_grpc
+from  . import agent_pb2_grpc
+from . import server_pb2
+from . import server_pb2_grpc
 from lback.utils import lback_agents, lback_backup_chunked_file
 
 class Server(server_pb2_grpc.ServerServicer):
@@ -40,10 +40,11 @@ class Server(server_pb2_grpc.ServerServicer):
      src_agent = self._GetAgent( request.src )
      dst_agent = self._GetAgent( request.dst )
      def chunked_iterator():
-          for relocate_cmd_chunk in  src_agent.DoRelocateTake( request ):
-	   	yield relocate_cmd_chunk
+          for relocate_take_chunk in  src_agent.DoRelocateTake( request ):
+	   	yield relocate_take_chunk
      try:
-	  relocate_cmd_status = dst_agent.DoRelocateGive( chunked_iterator )
+	  for _ in dst_agent.DoRelocateGive( chunked_iterator ):
+		 pass
      except Exception,ex:
 	  return server_pb2.RelocateCmdStatus(errored=True)
      return server_pb2.RelocateCmdStatus(errored=False)

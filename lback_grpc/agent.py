@@ -1,7 +1,7 @@
 from lback.backup import Backup
 from lback.utils import lback_backup, lback_backup_chunked_file, lback_backup_remove
-import agent_pb2
-import agent_pb2_grpc
+from . import agent_pb2
+from . import agent_pb2_grpc
 from itertools import tee
 
 class Agent(agent_pb2_grpc.AgentServicer):
@@ -25,7 +25,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
 	for file_chunk_res in lback_backup_file_chunks( request.id ):
 	    yield agent_pb2.RelocateCmdGiveStatus( raw_data=file_chunk_res, errored=False)
      except Exception,ex:
-         return agent_pb2.RelocateCmdGiveStatus( errored=True )
+         yield agent_pb2.RelocateCmdGiveStatus( errored=True )
   def DoRelocateGive(self, request_iterator, context):
     iter_copy = tee( request_iterator )
     request = iter_copy()
@@ -38,7 +38,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
         for relocate_chunk_res in backup.run_chunked( relocate_chunked_iterator ):
 	    yield agent_pb2.RelocateCmdStatus(errored=False)
     except Exception,ex:
-	 return agent_pb2.RelocateCmdStatus(errored=True )
+	 yield agent_pb2.RelocateCmdStatus(errored=True )
 
   def DoRestore(self, request, context):
     db_backup =lback_backup( request.id )
@@ -49,7 +49,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
 		errored=False,
 		raw_data=restore_file_chunk )
     except Exception,ex:
-	return agent_pb2.RestoreCmdStatus( errored=True )
+	yield agent_pb2.RestoreCmdStatus( errored=True )
 
   def DoRm(self, request, context):
     try:
