@@ -16,15 +16,20 @@ class AgentStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.DoBackup = channel.stream_stream(
+    self.DoBackup = channel.stream_unary(
         '/lbackgrpc.Agent/DoBackup',
-        request_serializer=shared__pb2.BackupCmd.SerializeToString,
+        request_serializer=shared__pb2.BackupCmdStream.SerializeToString,
         response_deserializer=shared__pb2.BackupCmdStatus.FromString,
         )
-    self.DoMv = channel.unary_unary(
-        '/lbackgrpc.Agent/DoMv',
-        request_serializer=shared__pb2.MvCmd.SerializeToString,
-        response_deserializer=shared__pb2.MvCmdStatus.FromString,
+    self.DoMvTake = channel.unary_stream(
+        '/lbackgrpc.Agent/DoMvTake',
+        request_serializer=shared__pb2.MvCmdTake.SerializeToString,
+        response_deserializer=shared__pb2.MvCmdTakeStatus.FromString,
+        )
+    self.DoMvGive = channel.stream_unary(
+        '/lbackgrpc.Agent/DoMvGive',
+        request_serializer=shared__pb2.MvCmdGiveStream.SerializeToString,
+        response_deserializer=shared__pb2.MvCmdGiveStatus.FromString,
         )
     self.DoRestore = channel.unary_stream(
         '/lbackgrpc.Agent/DoRestore',
@@ -47,7 +52,12 @@ class AgentServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def DoMv(self, request, context):
+  def DoMvTake(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def DoMvGive(self, request_iterator, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -65,15 +75,20 @@ class AgentServicer(object):
 
 def add_AgentServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'DoBackup': grpc.stream_stream_rpc_method_handler(
+      'DoBackup': grpc.stream_unary_rpc_method_handler(
           servicer.DoBackup,
-          request_deserializer=shared__pb2.BackupCmd.FromString,
+          request_deserializer=shared__pb2.BackupCmdStream.FromString,
           response_serializer=shared__pb2.BackupCmdStatus.SerializeToString,
       ),
-      'DoMv': grpc.unary_unary_rpc_method_handler(
-          servicer.DoMv,
-          request_deserializer=shared__pb2.MvCmd.FromString,
-          response_serializer=shared__pb2.MvCmdStatus.SerializeToString,
+      'DoMvTake': grpc.unary_stream_rpc_method_handler(
+          servicer.DoMvTake,
+          request_deserializer=shared__pb2.MvCmdTake.FromString,
+          response_serializer=shared__pb2.MvCmdTakeStatus.SerializeToString,
+      ),
+      'DoMvGive': grpc.stream_unary_rpc_method_handler(
+          servicer.DoMvGive,
+          request_deserializer=shared__pb2.MvCmdGiveStream.FromString,
+          response_serializer=shared__pb2.MvCmdGiveStatus.SerializeToString,
       ),
       'DoRestore': grpc.unary_stream_rpc_method_handler(
           servicer.DoRestore,

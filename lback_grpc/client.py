@@ -15,29 +15,21 @@ class Client( object ):
 	def _run( self, operation_instance ):
 	    id = operation_instance.get_id()
 	    if isinstance(operation_instance, OperationBackup ):
-	        def read_in_chunks(chunk_size=1024):
-		    while True:
-			chunk = backup.read( chunk_size )
-		 	if not chunk:
-			    break
-			yield chunk
 		backup = lback_backup_file( id )
-		replies = self.server.RouteBackup( read_in_chunks() )
+		replies = self.server.RouteBackup( server_pb2.BackupCmd(
+			 id=id ))
 		for reply in replies:
 		   if not reply.errored:
-		      lback_output("CHUNK delivered")
+		      lback_output("BACKUP propagated")
 		   else:
-		      lback_output("CHUNK undelivered")
+		      lback_output("BACKUP could not be propagated")
 	    elif isinstance(operation_instance, OperationRestore ):
-		replies = self.server.RouteRestore( 
+		reply = self.server.RouteRestore( 
 			server_pb2.RestoreCmd( id=id ) )
-		for reply in replies:
-		   if not reply.errored:
-		      lback_output("CHUNK delivered")
-		   else:
-		      lback_output("CHUNK undelivered")
-		   if reply.final:
-		       pass
+		if not reply.errored:
+		    lback_output("RESTORE successful")
+		else:
+		    lback_output("RESTORE could not be performed")
 	    elif isinstance(operation_instance, OperationMv ):
 		 reply = self.server.RouteMv( 
 			 server_pb2.MvCmd( 
@@ -45,9 +37,9 @@ class Client( object ):
 				src=operation_instance.get_arg("src"),
 				dst=operation_instance.get_arg("dst") ) )
 		 if not not reply.errored:
-		    lback_output("Moved compartment")
+		    lback_output("MOVE successful")
 		 else:
-		    lback_output("Unable to MOVE compartment")
+		    lback_output("MOVE could not be performed")
 	    elif isinstance(operation_instance, OperationRm ):
 		 is_all = operation_instance.get_arg("all")
 		 if is_all:
@@ -62,7 +54,6 @@ class Client( object ):
 					id=id,
 				 	target=target))
 		 if not not reply.errored:
-		    lback_output("Removed compartment")
+		    lback_output("REMOVE propagated")
 		 else:
-		    lback_output("Unable to REMOVE compartment")
-		
+		    lback_output("REMOVE could not be propagated")

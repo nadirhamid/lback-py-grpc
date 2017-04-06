@@ -16,7 +16,7 @@ class ServerStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.RouteBackup = channel.stream_stream(
+    self.RouteBackup = channel.unary_unary(
         '/lbackgrpc.Server/RouteBackup',
         request_serializer=shared__pb2.BackupCmd.SerializeToString,
         response_deserializer=shared__pb2.BackupCmdStatus.FromString,
@@ -26,12 +26,12 @@ class ServerStub(object):
         request_serializer=shared__pb2.MvCmd.SerializeToString,
         response_deserializer=shared__pb2.MvCmdStatus.FromString,
         )
-    self.RouteRestore = channel.unary_stream(
+    self.RouteRestore = channel.unary_unary(
         '/lbackgrpc.Server/RouteRestore',
         request_serializer=shared__pb2.RestoreCmd.SerializeToString,
         response_deserializer=shared__pb2.RestoreCmdStatus.FromString,
         )
-    self.RouteRm = channel.unary_unary(
+    self.RouteRm = channel.unary_stream(
         '/lbackgrpc.Server/RouteRm',
         request_serializer=shared__pb2.RmCmd.SerializeToString,
         response_deserializer=shared__pb2.RmCmdStatus.FromString,
@@ -42,7 +42,7 @@ class ServerServicer(object):
   """Interface exported by the server.
   """
 
-  def RouteBackup(self, request_iterator, context):
+  def RouteBackup(self, request, context):
     """A Bidirectional streaming RPC.
 
     Accepts a stream of RouteNotes sent while a route is being traversed,
@@ -70,7 +70,7 @@ class ServerServicer(object):
 
 def add_ServerServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'RouteBackup': grpc.stream_stream_rpc_method_handler(
+      'RouteBackup': grpc.unary_unary_rpc_method_handler(
           servicer.RouteBackup,
           request_deserializer=shared__pb2.BackupCmd.FromString,
           response_serializer=shared__pb2.BackupCmdStatus.SerializeToString,
@@ -80,12 +80,12 @@ def add_ServerServicer_to_server(servicer, server):
           request_deserializer=shared__pb2.MvCmd.FromString,
           response_serializer=shared__pb2.MvCmdStatus.SerializeToString,
       ),
-      'RouteRestore': grpc.unary_stream_rpc_method_handler(
+      'RouteRestore': grpc.unary_unary_rpc_method_handler(
           servicer.RouteRestore,
           request_deserializer=shared__pb2.RestoreCmd.FromString,
           response_serializer=shared__pb2.RestoreCmdStatus.SerializeToString,
       ),
-      'RouteRm': grpc.unary_unary_rpc_method_handler(
+      'RouteRm': grpc.unary_stream_rpc_method_handler(
           servicer.RouteRm,
           request_deserializer=shared__pb2.RmCmd.FromString,
           response_serializer=shared__pb2.RmCmdStatus.SerializeToString,

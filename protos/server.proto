@@ -42,9 +42,9 @@ service Server {
   //
   // Accepts a stream of RouteNotes sent while a route is being traversed,
   // while receiving other RouteNotes (e.g. from other users).
-  rpc RouteBackup(stream BackupCmd) returns (stream BackupCmdStatus) {}
+  rpc RouteBackup(BackupCmd) returns (BackupCmdStatus) {}
   rpc RouteMv(MvCmd) returns (MvCmdStatus) {}
-  rpc RouteRestore(RestoreCmd) returns (stream RestoreCmdStatus) {}
-  rpc RouteRm(RmCmd) returns (RmCmdStatus) {}
+  rpc RouteRestore(RestoreCmd) returns (RestoreCmdStatus) {}
+  rpc RouteRm(RmCmd) returns (stream RmCmdStatus) {}
 }
 

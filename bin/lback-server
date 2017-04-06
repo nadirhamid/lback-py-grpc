@@ -1,0 +1,32 @@
+#! /usr/bin/python
+from concurrent import futures
+import time
+
+import grpc
+
+import helloworld_pb2
+import helloworld_pb2_grpc
+import lback_grpc.server_pb2_grpc
+import argparse
+from lback_grpc.server import Server
+
+_ONE_DAY_IN_SECONDS = 60 * 60 * 24
+
+
+def serve( addr ):
+  server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+  server_pb2_grpc.add_ServerServicer_to_server(Server(), server)
+  server.add_insecure_port(addr)
+  server.start()
+  try:
+    while True:
+      time.sleep(_ONE_DAY_IN_SECONDS)
+  except KeyboardInterrupt:
+    server.stop(0)
+
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser()
+  parser.add_argument("--host", default="127.0.0.1")
+  parser.add_argument("--port", default="5000")
+  parsed = parser.parse_args()
+  serve( "{}:{}".format( parsed.host, parsed.port ) )

@@ -31,26 +31,19 @@ syntax = "proto3";
 package lbackgrpc;
 
 // Send BackupChunks from client to server to agents
+message BackupCmdStream {
+  // The location from which the message is sent.
+  string id = 1;
+  string raw_data = 2;
+}
 message BackupCmd {
   // The location from which the message is sent.
-  int32 chunk = 1;
-  string id = 2;
-  string raw_data = 3;
-}
-message BackupCmdStatus {
-  int32 chunk = 1;
-  int32 elapsed_time = 2;
-  string id = 3;
-  bool errored = 4;
-  bool final =  5;
-}
-message Backup {
   string id = 1;
 }
-message BackupStatus {
+
+message BackupCmdStatus {
   int32 elapsed_time = 1;
-  string id = 2;
-  bool errored = 3;
+  bool errored = 2;
 }
 message RestoreCmd {
   // The location from which the message is sent.
@@ -58,11 +51,9 @@ message RestoreCmd {
 }
 message RestoreCmdStatus {
   // The location from which the message is sent.
-  int32 chunk = 1;
-  int32 elapsed_time = 2;
-  string raw_data = 3;
-  bool errored = 4;
-  bool final = 5;
+  int32 elapsed_time = 1;
+  string raw_data = 2;
+  bool errored = 3;
 }
 message MvCmd {
   // The location from which the message is sent.
@@ -71,8 +62,27 @@ message MvCmd {
   string dst = 3;
 }
 
+message MvCmdTake {
+  string id = 1;
+}
+
+message MvCmdGiveStream {
+  // The location from which the message is sent.
+  string id = 1;
+  string raw_data = 2;
+}
 message MvCmdStatus {
-  bool errored  = 1;
+  int32 elapsed_time = 1;
+}
+
+message MvCmdTakeStatus {
+  int32 elapsed_time = 1;
+  bool errored  = 2;
+}
+
+message MvCmdGiveStatus {
+  // The location from which the message is sent.
+  bool errored = 1;
 }
 
 message RmCmd {
@@ -83,5 +93,6 @@ message RmCmd {
 }
 
 message RmCmdStatus {
-  bool errored  = 1;
+  int32 elapsed_time = 1;
+  bool errored = 2;
 }
