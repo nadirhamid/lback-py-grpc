@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='server.proto',
   package='lbackgrpc',
   syntax='proto3',
-  serialized_pb=_b('\n\x0cserver.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\x93\x02\n\x06Server\x12\x41\n\x0bRouteBackup\x12\x14.lbackgrpc.BackupCmd\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00\x12G\n\rRouteRelocate\x12\x16.lbackgrpc.RelocateCmd\x1a\x1c.lbackgrpc.RelocateCmdStatus\"\x00\x12\x44\n\x0cRouteRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x12\x37\n\x07RouteRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x30\x01\x42\x1e\n\x12io.grpc.lback.grpcB\x06ServerP\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0cserver.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\x95\x02\n\x06Server\x12\x43\n\x0bRouteBackup\x12\x14.lbackgrpc.BackupCmd\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00\x30\x01\x12G\n\rRouteRelocate\x12\x16.lbackgrpc.RelocateCmd\x1a\x1c.lbackgrpc.RelocateCmdStatus\"\x00\x12\x44\n\x0cRouteRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x12\x37\n\x07RouteRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x30\x01\x42\x1e\n\x12io.grpc.lback.grpcB\x06ServerP\x01\x62\x06proto3')
   ,
   dependencies=[shared__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -51,7 +51,7 @@ try:
       Args:
         channel: A grpc.Channel.
       """
-      self.RouteBackup = channel.unary_unary(
+      self.RouteBackup = channel.unary_stream(
           '/lbackgrpc.Server/RouteBackup',
           request_serializer=shared__pb2.BackupCmd.SerializeToString,
           response_deserializer=shared__pb2.BackupCmdStatus.FromString,
@@ -105,7 +105,7 @@ try:
 
   def add_ServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        'RouteBackup': grpc.unary_unary_rpc_method_handler(
+        'RouteBackup': grpc.unary_stream_rpc_method_handler(
             servicer.RouteBackup,
             request_deserializer=shared__pb2.BackupCmd.FromString,
             response_serializer=shared__pb2.BackupCmdStatus.SerializeToString,
@@ -169,7 +169,6 @@ try:
       while receiving other RouteNotes (e.g. from other users).
       """
       raise NotImplementedError()
-    RouteBackup.future = None
     def RouteRelocate(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     RouteRelocate.future = None
@@ -199,7 +198,7 @@ try:
       ('lbackgrpc.Server', 'RouteRm'): shared__pb2.RmCmdStatus.SerializeToString,
     }
     method_implementations = {
-      ('lbackgrpc.Server', 'RouteBackup'): face_utilities.unary_unary_inline(servicer.RouteBackup),
+      ('lbackgrpc.Server', 'RouteBackup'): face_utilities.unary_stream_inline(servicer.RouteBackup),
       ('lbackgrpc.Server', 'RouteRelocate'): face_utilities.unary_unary_inline(servicer.RouteRelocate),
       ('lbackgrpc.Server', 'RouteRestore'): face_utilities.unary_unary_inline(servicer.RouteRestore),
       ('lbackgrpc.Server', 'RouteRm'): face_utilities.unary_stream_inline(servicer.RouteRm),
@@ -227,7 +226,7 @@ try:
       ('lbackgrpc.Server', 'RouteRm'): shared__pb2.RmCmdStatus.FromString,
     }
     cardinalities = {
-      'RouteBackup': cardinality.Cardinality.UNARY_UNARY,
+      'RouteBackup': cardinality.Cardinality.UNARY_STREAM,
       'RouteRelocate': cardinality.Cardinality.UNARY_UNARY,
       'RouteRestore': cardinality.Cardinality.UNARY_UNARY,
       'RouteRm': cardinality.Cardinality.UNARY_STREAM,

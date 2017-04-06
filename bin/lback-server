@@ -4,11 +4,10 @@ import time
 
 import grpc
 
-import helloworld_pb2
-import helloworld_pb2_grpc
-import lback_grpc.server_pb2_grpc
 import argparse
+from lback_grpc import server_pb2_grpc
 from lback_grpc.server import Server
+from lback.utils import lback_settings
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
@@ -26,7 +25,6 @@ def serve( addr ):
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
-  parser.add_argument("--host", default="127.0.0.1")
-  parser.add_argument("--port", default="5000")
   parsed = parser.parse_args()
-  serve( "{}:{}".format( parsed.host, parsed.port ) )
+  settings = lback_settings()
+  serve( "{}:{}".format( settings['server']['host'], settings['server']['port'] ) )

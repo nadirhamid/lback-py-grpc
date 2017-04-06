@@ -4,18 +4,16 @@ import time
 
 import grpc
 
-import helloworld_pb2
-import helloworld_pb2_grpc
-import lback_grpc.agent_pb2_grpc
 import argparse
+from lback_grpc import agent_pb2_grpc
 from lback_grpc.agent import Agent
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 
 def serve( addr ):
-  server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-  server_pb2_grpc.add_ServerServicer_to_server(Agent(), server)
+  server = grpc.server(futures.ThreadPoolExecutor(max_workers=1))
+  agent_pb2_grpc.add_AgentServicer_to_server(Agent(), server)
   server.add_insecure_port(addr)
   server.start()
   try:
