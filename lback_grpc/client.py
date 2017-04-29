@@ -42,7 +42,7 @@ class Client( object ):
 				id=id,
 				src=operation_instance.args.src,
 				dst=operation_instance.args.dst ) )
-		 if not not reply.errored:
+		 if not reply.errored:
 		    lback_output("RELOCATE successful")
 		 else:
 		    lback_output("RELOCATE could not be performed")
@@ -60,7 +60,7 @@ class Client( object ):
 					id=backup.id,
 				 	target=target))
 	   	 for reply in replies:
-		    if not not reply.errored:
+		    if not reply.errored:
 		       lback_output("REMOVE propagated")
 		    else:
 		       lback_output("REMOVE could not be propagated")
