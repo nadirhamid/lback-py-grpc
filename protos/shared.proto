@@ -39,6 +39,7 @@ message BackupCmdStream {
 message BackupCmd {
   // The location from which the message is sent.
   string id = 1;
+  string temp_id = 2;
 }
 
 message BackupCmdStatus {
