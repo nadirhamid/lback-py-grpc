@@ -7,19 +7,36 @@ import grpc
 import argparse
 from lback_grpc import server_pb2_grpc
 from lback_grpc.server import Server
-from lback.utils import lback_settings
-
-_ONE_DAY_IN_SECONDS = 60 * 60 * 24
-
+from lback.utils import lback_settings, lback_agents, lback_output
 
 def serve( addr ):
+  lback_server = Server()
   server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-  server_pb2_grpc.add_ServerServicer_to_server(Server(), server)
+  server_pb2_grpc.add_ServerServicer_to_server(lback_server, server)
   server.add_insecure_port(addr)
   server.start()
+
+  def send_agent_notifications():
+       lback_output("CHECKING FOR NEW AGENTS")
+       server_agents = lback_server.agents
+       db_agents = lback_agents()
+       for server_agent in server_agents:
+          def db_agent_filter( db_agent ):
+             if db_agent.id == server_agent[0].id:
+                 return True
+             return False
+          filtered_db_agents = filter(db_agent_filter, db_agents)
+          if not len( filtered_db_agents ) > 0: 
+              lback_server.RemoveAgent(server_agent)
+       for agent_object in db_agents:
+            registered_agent = lback_server.FindAgent(agent_object.id)
+            if not registered_agent:
+                lback_server.AddAgentByDbObject(agent_object)
   try:
     while True:
-      time.sleep(_ONE_DAY_IN_SECONDS)
+       send_agent_notifications()
+       time.sleep( 5.0 )
+      
   except KeyboardInterrupt:
     server.stop(0)
 

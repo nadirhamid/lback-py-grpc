@@ -9,32 +9,57 @@ from traceback import print_exc
 from lback.utils import lback_agents, lback_backup_chunked_file, lback_output, lback_backup
 from lback.restore import Restore
 
+def make_connection_string( agent_object ):
+     connection_string = "{}:{}".format(agent_object.host, agent_object.port)
+     return connection_string
+
+def safe_send( agent, agent_fn ):
+    res = None
+    try:
+        res = agent_fn ( agent[ 1 ] )
+    except Exception,ex:
+        lback_output("Unable to send command to LBACK AGENT: {}".format( make_connection_string( agent[ 0 ] )))
+    return res
+
 class Server(server_pb2_grpc.ServerServicer):
   def __init__(self):
     agent_objects = lback_agents()
     self.agents = [] ## STUBS and CHANNELS
     for agent_object in agent_objects:
-     connection_string = agent_object.host+":"+agent_object.port
+       self.AddAgentByDbObject(agent_object)
+
+  def AddAgentByDbObject(self, agent_object):
+     connection_string = make_connection_string( agent_object )
      lback_output("Registering AGENT %s"%(connection_string))
      channel = grpc.insecure_channel(connection_string)
      self.agents.append( ( agent_object, agent_pb2_grpc.AgentStub( channel ), ) )
-
-  def _GetAgent(self, agent_id):
+  def FindAgent(self, agent_id):
     for agent in self.agents:
-     if agent[0]==agent_id:
-         return agent[1]
-  def _GetRestoreCandidate(self):
+     if agent[0].id==agent_id:
+         return agent
+  def FindRestoreCandidate(self):
      return self.agents[0][1]
-
-  def _RouteOnAllAgents(self, fn):
+  def RemoveAgent(self, server_object):
+     connection_string = make_connection_string( server_object[0] )
+     lback_output("Removing AGENT %s"%(connection_string))
+     self.agents.remove( server_object )
+  def RouteOnAllAgents(self, agent_fn):
     agents = self.agents
+    lback_output("ROUTE ON ALL AGENTS")
+    lback_output(agents)
     for agent in agents:
        agent_object = agent[ 0 ] 
        agent_channel = agent[ 1 ]
-       connection_string = agent_object.host+":"+agent_object.port
+       connection_string =  make_connection_string( agent_object )
        lback_output("DELIVERING to AGENT %s"%( connection_string))
-       result = fn( agent_channel )
+       result = safe_send(agent, agent_fn)
        yield result
+  def RouteOnAgent(self, agent, agent_fn):
+     agent_object = agent[0]
+     connection_string =  make_connection_string( agent_object )
+     lback_output("DELIVERING to AGENT %s"%( connection_string))
+     return safe_send(agent, agent_fn)
+
   def RouteBackup(self, request, context):
     lback_output("Received COMMAND RouteBackup")
     def chunked_iterator(agent):
@@ -49,49 +74,63 @@ class Server(server_pb2_grpc.ServerServicer):
        backup_res = agent.DoBackup( iterator )
        lback_output("COMPLETED BACKUP")
        return backup_res
-    try:
-       iterator = self._RouteOnAllAgents( route_fn )
-       for cmd_response in iterator:
-           yield cmd_response
-    except Exception,ex:
-       print_exc( ex )
-       yield shared_pb2.BackupCmdStatus(errored=True)
-
+    iterator = self.RouteOnAllAgents( route_fn )
+    for cmd_response in iterator:
+      if cmd_response is None:
+          yield shared_pb2.BackupCmdStatus(errored=True)
+      else:
+          yield cmd_response
   def RouteRelocate(self, request, context):  
      lback_output("Received COMMAND RouteRelocate")
-     src_agent = self._GetAgent( request.src )
-     dst_agent = self._GetAgent( request.dst )
-     def chunked_iterator():
-         iterator = src_agent.DoRelocateTake( request )
-         for relocate_take_chunk in  iterator:
-             yield relocate_take_chunk
-     try:
-         iterator = dst_agent.DoRelocateGive(chunked_iterator())
+     src_agent = self.FindAgent( request.src )
+     dst_agent = self.FindAgent( request.dst )
+     iterator = None
+     def agent_take_fn():
+         return src_agent[1].DoRelocateTake( request )
+     def agent_give_fn():
+         return dst_agent[1].DoRelocateGive(chunked_iterator())
+     def give_loop_all(iterator):
          for _ in iterator:
-              pass
-     except Exception,ex:
-         print_exc( ex )
-         return shared_pb2.RelocateCmdStatus(errored=True)
+             pass
 
+     def chunked_iterator():
+         iterator = self.RouteOnAgent( src_agent, agent_take_fn )
+         if not iterator:
+             yield None
+         else:
+             for relocate_take_chunk in  iterator:
+                 yield relocate_take_chunk
+     iterator = self.RouteOnAgent( dst_agent, agent_give_fn )
+     if not iterator:
+         return shared_pb2.RelocateCmdStatus(errored=True)
+     give_loop_all(iterator)
      lback_output("COMPLETED RELOCATE")
      return shared_pb2.RelocateCmdStatus(errored=False)
      
   def RouteRestore(self, request, context):
      lback_output("Received COMMAND RouteRestore")
-     dst_agent = self._GetRestoreCandidate()
+     dst_agent = self.FindRestoreCandidate()
      db_backup = lback_backup( request.id )
      restore = Restore( request.id, folder=db_backup.folder )
-     agent_iterator = dst_agent.DoRestore( request )
+     def agent_restore_fn():
+         return dst_agent[1].DoRestore( request )
      def chunked_iterator():
-         for restore_cmd_chunk in agent_iterator:
-             yield restore_cmd_chunk.raw_data
-     try:
-         iterator = chunked_iterator()
-         restore.run_chunked( iterator )
-     except Exception,ex:
-         print_exc( ex )
-         return shared_pb2.RestoreCmdStatus(errored=True)
+         def verify_all_chunks():
+            for restore_cmd_chunk in agent_iterator:
+               if not restore_cmd_chunk:
+                  yield None
+               else:
+                  yield restore_cmd_chunk.raw_data
+         agent_iterator = self.RouteOnAgent( dst_agent, agent_restore_fn )
+         if not agent_iterator:
+             yield None
+         else:
+             verify_all_chunks()
 
+     iterator = chunked_iterator()
+     if not iterator:
+         return shared_pb2.RestoreCmdStatus(errored=True)
+     restore.run_chunked( iterator )
      lback_output("COMPLETED RESTORE")
      return shared_pb2.RestoreCmdStatus(errored=False)
 
@@ -103,15 +142,17 @@ class Server(server_pb2_grpc.ServerServicer):
       def route_fn(agent):
           status = agent.DoRm(request)
           yield status
-      try:
-          if all:
-              iterator = self._RouteOnAllAgents( route_fn )
-              for rm_cmd_reply in iterator:
-                  yield shared_pb2.RmCmdStatus(errored=False)
-                  lback_output("COMPLETED REMOVE")
-          else:
-              yield shared_pb2.RmCmdStatus(errored=False)
-              lback_output("COMPLETED REMOVE")
-      except Exception,ex:
-          print_exc( ex )
-      yield shared_pb2.RmCmdStatus(errored=True)
+      def handle_all_rm():
+          iterator = self.RouteOnAllAgents( route_fn )
+          for rm_cmd_reply in iterator:
+             if not rm_cmd_reply:
+                yield shared_pb2.RmCmdStatus(errored=True)
+             else:
+                lback_output("COMPLETED REMOVE")
+                yield shared_pb2.RmCmdStatus(errored=True)
+      def handle_target_rm():
+          lback_output("NOT IMPLEMENTED")
+          yield shared_pb2.RmCmdStatus(errored=True)
+      if not all:
+          handle_target_rm()
+      handle_all_rm()
