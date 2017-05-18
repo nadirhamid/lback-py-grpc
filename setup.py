@@ -10,6 +10,11 @@ class installsetup(install):
     def run(self):
       install.run(self)
 
+deps = [
+   "grpcio==1.0.0",
+   "grpcio-tools==1.2.1"
+]
+
 setup(name="LinuxOpenSuseBackupToolGRPC",
       version="0.1.0",
       description="GRPC for Lback",
@@ -37,4 +42,5 @@ setup(name="LinuxOpenSuseBackupToolGRPC",
           'Topic :: Internet :: WWW/HTTP :: WSGI :: Server',
           'Topic :: Software Development :: Libraries :: Python Modules'
       ],
+      install_requires=deps,
       cmdclass=dict(install=installsetup))
