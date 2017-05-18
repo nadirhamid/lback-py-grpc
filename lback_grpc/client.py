@@ -36,7 +36,7 @@ class Client( object ):
                 lback_output("BACKUP could not be propagated")
         lback_output("Removing TEMP backup")
         os.remove( temp_backup_path )
-    def _run_restore( self, operation_instance ):
+    def _run_restore( self, operation_instance, backup ):
         lback_output("Routing RESTORE")
         reply = self.server.RouteRestore( 
             shared_pb2.RestoreCmd( id=backup.id ) )
@@ -55,7 +55,7 @@ class Client( object ):
            lback_output("RELOCATE successful")
         else:
            lback_output("RELOCATE could not be performed")
-    def _run_remove( self, operation_instance ):
+    def _run_remove( self, operation_instance, backup ):
         lback_output("Routing REMOVE")
         if operation_instance.args.all:
              replies = self.server.RouteRm( 
@@ -73,12 +73,12 @@ class Client( object ):
                     lback_output("REMOVE propagated")
                 else:
                     lback_output("REMOVE could not be propagated")
-    def _run( self, operation_instance, backup=None):
+    def _run( self, operation_instance, backup ):
         if isinstance(operation_instance, OperationBackup ):
             self._run_backup( operation_instance, backup )
         elif isinstance(operation_instance, OperationRestore ):
-            self._run_restore( operation_instance )
+            self._run_restore( operation_instance, backup )
         elif isinstance(operation_instance, OperationRelocate ):
-            self._run_relocate( operation_instance )
+            self._run_relocate( operation_instance, backup )
         elif isinstance(operation_instance, OperationRm ):
-            self._run_remove( operation_instance )
+            self._run_remove( operation_instance, backup )

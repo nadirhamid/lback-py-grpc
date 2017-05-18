@@ -1,4 +1,5 @@
 import grpc
+from . import make_connection_string, safe_rpc
 from  . import agent_pb2_grpc
 from . import server_pb2
 from . import server_pb2_grpc
@@ -8,18 +9,6 @@ from traceback import print_exc
 
 from lback.utils import lback_agents, lback_backup_chunked_file, lback_output, lback_backup
 from lback.restore import Restore
-
-def make_connection_string( agent_object ):
-     connection_string = "{}:{}".format(agent_object.host, agent_object.port)
-     return connection_string
-
-def safe_send( agent, agent_fn ):
-    res = None
-    try:
-        res = agent_fn ( agent[ 1 ] )
-    except Exception,ex:
-        lback_output("Unable to send command to LBACK AGENT: {}".format( make_connection_string( agent[ 0 ] )))
-    return res
 
 class Server(server_pb2_grpc.ServerServicer):
   def __init__(self):
@@ -38,7 +27,7 @@ class Server(server_pb2_grpc.ServerServicer):
      if agent[0].id==agent_id:
          return agent
   def FindRestoreCandidate(self):
-     return self.agents[0][1]
+     return self.agents[0]
   def RemoveAgent(self, server_object):
      connection_string = make_connection_string( server_object[0] )
      lback_output("Removing AGENT %s"%(connection_string))
@@ -52,13 +41,17 @@ class Server(server_pb2_grpc.ServerServicer):
        agent_channel = agent[ 1 ]
        connection_string =  make_connection_string( agent_object )
        lback_output("DELIVERING to AGENT %s"%( connection_string))
-       result = safe_send(agent, agent_fn)
+       result = safe_rpc(agent, agent_fn)
        yield result
   def RouteOnAgent(self, agent, agent_fn):
+     lback_output("ROUTE ON AGENT")
      agent_object = agent[0]
      connection_string =  make_connection_string( agent_object )
      lback_output("DELIVERING to AGENT %s"%( connection_string))
-     return safe_send(agent, agent_fn)
+     reply =  safe_rpc(agent, agent_fn)
+     lback_output("RESPONSE")
+     lback_output( reply )
+     return reply
 
   def RouteBackup(self, request, context):
     lback_output("Received COMMAND RouteBackup")
@@ -85,10 +78,10 @@ class Server(server_pb2_grpc.ServerServicer):
      src_agent = self.FindAgent( request.src )
      dst_agent = self.FindAgent( request.dst )
      iterator = None
-     def agent_take_fn():
-         return src_agent[1].DoRelocateTake( request )
+     def agent_take_fn(agent):
+         return agent.DoRelocateTake( request )
      def agent_give_fn():
-         return dst_agent[1].DoRelocateGive(chunked_iterator())
+         return agent.DoRelocateGive(chunked_iterator())
      def give_loop_all(iterator):
          for _ in iterator:
              pass
@@ -112,27 +105,23 @@ class Server(server_pb2_grpc.ServerServicer):
      dst_agent = self.FindRestoreCandidate()
      db_backup = lback_backup( request.id )
      restore = Restore( request.id, folder=db_backup.folder )
-     def agent_restore_fn():
-         return dst_agent[1].DoRestore( request )
+     def agent_restore_fn(agent):
+         return agent.DoRestore( request )
      def chunked_iterator():
-         def verify_all_chunks():
-            for restore_cmd_chunk in agent_iterator:
-               if not restore_cmd_chunk:
-                  yield None
-               else:
-                  yield restore_cmd_chunk.raw_data
          agent_iterator = self.RouteOnAgent( dst_agent, agent_restore_fn )
-         if not agent_iterator:
-             yield None
-         else:
-             verify_all_chunks()
-
-     iterator = chunked_iterator()
-     if not iterator:
-         return shared_pb2.RestoreCmdStatus(errored=True)
-     restore.run_chunked( iterator )
-     lback_output("COMPLETED RESTORE")
-     return shared_pb2.RestoreCmdStatus(errored=False)
+         for restore_cmd_chunk in agent_iterator:
+           lback_output("Receiving CHUNK")
+           if not restore_cmd_chunk:
+              yield None
+           else:
+              yield restore_cmd_chunk.raw_data
+     try:
+        iterator = chunked_iterator()
+        restore.run_chunked( iterator )
+        lback_output("COMPLETED RESTORE")
+        return shared_pb2.RestoreCmdStatus(errored=False)
+     except Exception,ex:
+        return shared_pb2.RestoreCmdStatus(errored=True)
 
   def RouteRm(self, request, context):
       lback_output("Received COMMAND RouteRm")

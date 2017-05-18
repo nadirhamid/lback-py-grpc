@@ -58,9 +58,8 @@ class Agent(agent_pb2_grpc.AgentServicer):
   def DoRestore(self, request, context):
     lback_output("Received COMMAND DoRestore")
     db_backup =lback_backup( request.id )
-    restore = Restore( request.id, folder=db_backup.folder )
     try:
-        iterator = restore.read_chunked()
+        iterator = lback_backup_chunked_file(db_backup.id)
         for restore_file_chunk in iterator:
             lback_output("PACKING RESTORE CHUNK")
             yield shared_pb2.RestoreCmdStatus( 
