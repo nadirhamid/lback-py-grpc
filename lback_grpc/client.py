@@ -24,7 +24,7 @@ class Client( object ):
         temp_backup_id = lback_id_temp( backup.id )
         real_backup_path = lback_backup_path( backup.id )
         temp_backup_path = lback_backup_path( temp_backup_id )
-        shutil.copy( real_backup_path, temp_backup_path )
+        shutil.move( real_backup_path, temp_backup_path )
         msg = shared_pb2.BackupCmd(
            id=backup.id,
            temp_id=temp_backup_id )
@@ -38,8 +38,11 @@ class Client( object ):
         os.remove( temp_backup_path )
     def _run_restore( self, operation_instance, backup ):
         lback_output("Routing RESTORE")
+        cmd = shared_pb2.RestoreCmd( id=backup.id )
+        if operation_instance.args.folder:
+            cmd = shared_pb2.RestoreCmd( id=backup.id, use_temp_folder=True, folder=operation_instance.args.folder ) 
         reply = self.server.RouteRestore( 
-            shared_pb2.RestoreCmd( id=backup.id ) )
+            cmd )
         if not reply.errored:
             lback_output("RESTORE successful")
         else:

@@ -49,8 +49,6 @@ message BackupCmdStatus {
 message RestoreCmd {
   // The location from which the message is sent.
   string id = 1;
-  string folder = 2;
-  bool use_temp_folder = 3;
 }
 message RestoreCmdStatus {
   // The location from which the message is sent.

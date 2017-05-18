@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='shared.proto',
   package='lbackgrpc',
   syntax='proto3',
-  serialized_pb=_b('\n\x0cshared.proto\x12\tlbackgrpc\"/\n\x0f\x42\x61\x63kupCmdStream\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\"(\n\tBackupCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0f\n\x07temp_id\x18\x02 \x01(\t\"8\n\x0f\x42\x61\x63kupCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"\x18\n\nRestoreCmd\x12\n\n\x02id\x18\x01 \x01(\t\"K\n\x10RestoreCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\x0f\n\x07\x65rrored\x18\x03 \x01(\x08\"3\n\x0bRelocateCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0b\n\x03src\x18\x02 \x01(\t\x12\x0b\n\x03\x64st\x18\x03 \x01(\t\"\x1d\n\x0fRelocateCmdTake\x12\n\n\x02id\x18\x01 \x01(\t\"5\n\x15RelocateCmdGiveStream\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\")\n\x11RelocateCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\">\n\x15RelocateCmdTakeStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"(\n\x15RelocateCmdGiveStatus\x12\x0f\n\x07\x65rrored\x18\x01 \x01(\x08\"0\n\x05RmCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06target\x18\x02 \x01(\t\x12\x0b\n\x03\x61ll\x18\x03 \x01(\x08\"4\n\x0bRmCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\x62\x06proto3')
+  serialized_pb=_b('\n\x0cshared.proto\x12\tlbackgrpc\"/\n\x0f\x42\x61\x63kupCmdStream\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\"(\n\tBackupCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0f\n\x07temp_id\x18\x02 \x01(\t\"8\n\x0f\x42\x61\x63kupCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"A\n\nRestoreCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x17\n\x0fuse_temp_folder\x18\x03 \x01(\x08\"K\n\x10RestoreCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\x0f\n\x07\x65rrored\x18\x03 \x01(\x08\"3\n\x0bRelocateCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0b\n\x03src\x18\x02 \x01(\t\x12\x0b\n\x03\x64st\x18\x03 \x01(\t\"\x1d\n\x0fRelocateCmdTake\x12\n\n\x02id\x18\x01 \x01(\t\"5\n\x15RelocateCmdGiveStream\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\")\n\x11RelocateCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\">\n\x15RelocateCmdTakeStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"(\n\x15RelocateCmdGiveStatus\x12\x0f\n\x07\x65rrored\x18\x01 \x01(\x08\"0\n\x05RmCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06target\x18\x02 \x01(\t\x12\x0b\n\x03\x61ll\x18\x03 \x01(\x08\"4\n\x0bRmCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"\x16\n\x08\x43heckCmd\x12\n\n\x02id\x18\x01 \x01(\t\"!\n\x0e\x43heckCmdStatus\x12\x0f\n\x07\x65rrored\x18\x01 \x01(\x08\x62\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -154,6 +154,20 @@ _RESTORECMD = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='folder', full_name='lbackgrpc.RestoreCmd.folder', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='use_temp_folder', full_name='lbackgrpc.RestoreCmd.use_temp_folder', index=2,
+      number=3, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -167,7 +181,7 @@ _RESTORECMD = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=176,
-  serialized_end=200,
+  serialized_end=241,
 )
 
 
@@ -211,8 +225,8 @@ _RESTORECMDSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=202,
-  serialized_end=277,
+  serialized_start=243,
+  serialized_end=318,
 )
 
 
@@ -256,8 +270,8 @@ _RELOCATECMD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=279,
-  serialized_end=330,
+  serialized_start=320,
+  serialized_end=371,
 )
 
 
@@ -287,8 +301,8 @@ _RELOCATECMDTAKE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=332,
-  serialized_end=361,
+  serialized_start=373,
+  serialized_end=402,
 )
 
 
@@ -325,8 +339,8 @@ _RELOCATECMDGIVESTREAM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=363,
-  serialized_end=416,
+  serialized_start=404,
+  serialized_end=457,
 )
 
 
@@ -356,8 +370,8 @@ _RELOCATECMDSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=418,
-  serialized_end=459,
+  serialized_start=459,
+  serialized_end=500,
 )
 
 
@@ -394,8 +408,8 @@ _RELOCATECMDTAKESTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=461,
-  serialized_end=523,
+  serialized_start=502,
+  serialized_end=564,
 )
 
 
@@ -425,8 +439,8 @@ _RELOCATECMDGIVESTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=525,
-  serialized_end=565,
+  serialized_start=566,
+  serialized_end=606,
 )
 
 
@@ -470,8 +484,8 @@ _RMCMD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=567,
-  serialized_end=615,
+  serialized_start=608,
+  serialized_end=656,
 )
 
 
@@ -508,8 +522,70 @@ _RMCMDSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=617,
-  serialized_end=669,
+  serialized_start=658,
+  serialized_end=710,
+)
+
+
+_CHECKCMD = _descriptor.Descriptor(
+  name='CheckCmd',
+  full_name='lbackgrpc.CheckCmd',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='lbackgrpc.CheckCmd.id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=712,
+  serialized_end=734,
+)
+
+
+_CHECKCMDSTATUS = _descriptor.Descriptor(
+  name='CheckCmdStatus',
+  full_name='lbackgrpc.CheckCmdStatus',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='errored', full_name='lbackgrpc.CheckCmdStatus.errored', index=0,
+      number=1, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=736,
+  serialized_end=769,
 )
 
 DESCRIPTOR.message_types_by_name['BackupCmdStream'] = _BACKUPCMDSTREAM
@@ -525,6 +601,8 @@ DESCRIPTOR.message_types_by_name['RelocateCmdTakeStatus'] = _RELOCATECMDTAKESTAT
 DESCRIPTOR.message_types_by_name['RelocateCmdGiveStatus'] = _RELOCATECMDGIVESTATUS
 DESCRIPTOR.message_types_by_name['RmCmd'] = _RMCMD
 DESCRIPTOR.message_types_by_name['RmCmdStatus'] = _RMCMDSTATUS
+DESCRIPTOR.message_types_by_name['CheckCmd'] = _CHECKCMD
+DESCRIPTOR.message_types_by_name['CheckCmdStatus'] = _CHECKCMDSTATUS
 
 BackupCmdStream = _reflection.GeneratedProtocolMessageType('BackupCmdStream', (_message.Message,), dict(
   DESCRIPTOR = _BACKUPCMDSTREAM,
@@ -616,6 +694,20 @@ RmCmdStatus = _reflection.GeneratedProtocolMessageType('RmCmdStatus', (_message.
   # @@protoc_insertion_point(class_scope:lbackgrpc.RmCmdStatus)
   ))
 _sym_db.RegisterMessage(RmCmdStatus)
+
+CheckCmd = _reflection.GeneratedProtocolMessageType('CheckCmd', (_message.Message,), dict(
+  DESCRIPTOR = _CHECKCMD,
+  __module__ = 'shared_pb2'
+  # @@protoc_insertion_point(class_scope:lbackgrpc.CheckCmd)
+  ))
+_sym_db.RegisterMessage(CheckCmd)
+
+CheckCmdStatus = _reflection.GeneratedProtocolMessageType('CheckCmdStatus', (_message.Message,), dict(
+  DESCRIPTOR = _CHECKCMDSTATUS,
+  __module__ = 'shared_pb2'
+  # @@protoc_insertion_point(class_scope:lbackgrpc.CheckCmdStatus)
+  ))
+_sym_db.RegisterMessage(CheckCmdStatus)
 
 
 try:

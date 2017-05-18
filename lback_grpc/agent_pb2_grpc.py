@@ -41,6 +41,11 @@ class AgentStub(object):
         request_serializer=shared__pb2.RmCmd.SerializeToString,
         response_deserializer=shared__pb2.RmCmdStatus.FromString,
         )
+    self.DoCheckBackupExists = channel.unary_unary(
+        '/lbackgrpc.Agent/DoCheckBackupExists',
+        request_serializer=shared__pb2.CheckCmd.SerializeToString,
+        response_deserializer=shared__pb2.CheckCmdStatus.FromString,
+        )
 
 
 class AgentServicer(object):
@@ -72,6 +77,11 @@ class AgentServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def DoCheckBackupExists(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_AgentServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -99,6 +109,11 @@ def add_AgentServicer_to_server(servicer, server):
           servicer.DoRm,
           request_deserializer=shared__pb2.RmCmd.FromString,
           response_serializer=shared__pb2.RmCmdStatus.SerializeToString,
+      ),
+      'DoCheckBackupExists': grpc.unary_unary_rpc_method_handler(
+          servicer.DoCheckBackupExists,
+          request_deserializer=shared__pb2.CheckCmd.FromString,
+          response_serializer=shared__pb2.CheckCmdStatus.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

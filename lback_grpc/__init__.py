@@ -7,7 +7,7 @@ def make_connection_string( agent_object ):
 def safe_rpc( agent, agent_fn ):
     res = None
     try:
-        res = agent_fn ( agent[ 1 ] )
+        res = agent_fn ( agent )
     except Exception,ex:
         lback_output( ex )
         lback_output("Unable to send command to LBACK AGENT: {}".format( make_connection_string( agent[ 0 ] )))

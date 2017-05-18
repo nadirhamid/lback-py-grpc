@@ -6,8 +6,9 @@ import grpc
 
 import argparse
 from lback_grpc import server_pb2_grpc
+from lback_grpc import shared_pb2
 from lback_grpc.server import Server
-from lback.utils import lback_settings, lback_agents, lback_output
+from lback.utils import lback_settings, lback_agents, lback_output, lback_backups
 
 def serve( addr ):
   lback_server = Server()
@@ -41,7 +42,7 @@ def serve( addr ):
   try:
     while True:
        check_for_agent_updates()
-       schedule_backups()
+       ##schedule_backups()
        time.sleep( 5.0 )
       
   except KeyboardInterrupt:

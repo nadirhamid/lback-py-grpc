@@ -7,6 +7,7 @@ from . import shared_pb2
 from . import shared_pb2_grpc
 from itertools import tee
 from traceback import print_exc
+import os
 
 class Agent(agent_pb2_grpc.AgentServicer):
   def DoBackup(self, request_iterator, context):    
@@ -80,7 +81,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
     return shared_pb2.RmCmdStatus( errored=False )
   def DoCheckBackupExists(self, request, context):
      lback_output("Received COMMAND DoCheckBackupExists")
-     if os.path.exists( lback_backup_path( db_backup.id ) )
+     if os.path.exists( lback_backup_path( request.id ) ):
        lback_output("BACKUP EXISTS")
        return shared_pb2.CheckCmdStatus(
           errored=False)

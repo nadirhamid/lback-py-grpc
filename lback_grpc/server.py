@@ -29,7 +29,7 @@ class Server(server_pb2_grpc.ServerServicer):
   def FindRestoreCandidate(self, backup):
      def route_fn( agent ):
         check_cmd = shared_pb2.CheckCmd(id=backup.id)
-        exists = agent.DoCheckBackupExists(check_cmd)
+        exists = agent[1].DoCheckBackupExists(check_cmd)
         return ( exists, agent, )
      routed = self.RouteOnAllAgents( route_fn )
      for ( check_cmd_resp, agent ) in routed:
@@ -71,7 +71,7 @@ class Server(server_pb2_grpc.ServerServicer):
     def route_fn(agent ):
        lback_output("RUNNING CHUNKED ITERATOR")
        iterator = chunked_iterator( agent )
-       exists = agent.DoCheckBackupExists( shared_pb2.CheckCmd(
+       exists = agent[1].DoCheckBackupExists( shared_pb2.CheckCmd(
           id=request.id ))
        if not exists.errored:
           shared_pb2.BackupCmdStatus(errored=False)
@@ -90,9 +90,9 @@ class Server(server_pb2_grpc.ServerServicer):
      dst_agent = self.FindAgent( request.dst )
      iterator = None
      def agent_take_fn(agent):
-         return agent.DoRelocateTake( request )
+         return agent[1].DoRelocateTake( request )
      def agent_give_fn():
-         return agent.DoRelocateGive(chunked_iterator())
+         return agent[1].DoRelocateGive(chunked_iterator())
      def give_loop_all(iterator):
          for _ in iterator:
              pass
@@ -115,9 +115,15 @@ class Server(server_pb2_grpc.ServerServicer):
      lback_output("Received COMMAND RouteRestore")
      db_backup = lback_backup( request.id )
      dst_agent = self.FindRestoreCandidate( db_backup )
-     restore = Restore( request.id, folder=db_backup.folder )
+     if not dst_agent:
+        return shared_pb2.RestoreCmdStatus(errored=True)
+     folder = request.folder
+     if request.use_temp_folder:
+        restore = Restore( request.id, folder=request.folder )
+     else:
+        restore = Restore( request.id, folder=db_backup.folder )
      def agent_restore_fn(agent):
-         return agent.DoRestore( request )
+         return agent[1].DoRestore( request )
      def chunked_iterator():
          agent_iterator = self.RouteOnAgent( dst_agent, agent_restore_fn )
          for restore_cmd_chunk in agent_iterator:
@@ -140,7 +146,7 @@ class Server(server_pb2_grpc.ServerServicer):
       target = request.target
       id = request.id
       def route_fn(agent):
-          status = agent.DoRm(request)
+          status = agent[1].DoRm(request)
           yield status
       def handle_all_rm():
           iterator = self.RouteOnAllAgents( route_fn )
