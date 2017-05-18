@@ -16,7 +16,13 @@ def serve( addr ):
   server.add_insecure_port(addr)
   server.start()
 
-  def send_agent_notifications():
+  def schedule_backups():
+       lback_output("SCHEDULING BACKUPS")
+       backups = lback_backups()
+       for backup in backups:
+           lback_server.RouteBackup( shared_pb2.BackupCmd( 
+                id=backup.id ) )
+  def check_for_agent_updates():
        lback_output("CHECKING FOR NEW AGENTS")
        server_agents = lback_server.agents
        db_agents = lback_agents()
@@ -34,7 +40,8 @@ def serve( addr ):
                 lback_server.AddAgentByDbObject(agent_object)
   try:
     while True:
-       send_agent_notifications()
+       check_for_agent_updates()
+       schedule_backups()
        time.sleep( 5.0 )
       
   except KeyboardInterrupt:

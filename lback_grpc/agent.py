@@ -78,3 +78,12 @@ class Agent(agent_pb2_grpc.AgentServicer):
        return shared_pb2.RmCmdStatus( errored=True )
     lback_output("REMOVE COMPLETE")
     return shared_pb2.RmCmdStatus( errored=False )
+  def DoCheckBackupExists(self, request, context):
+     lback_output("Received COMMAND DoCheckBackupExists")
+     if os.path.exists( lback_backup_path( db_backup.id ) )
+       lback_output("BACKUP EXISTS")
+       return shared_pb2.CheckCmdStatus(
+          errored=False)
+     lback_output("BACKUP DOES NOT EXIST")
+     return shared_pb2.CheckCmdStatus(
+        errored=True)

@@ -42,6 +42,7 @@ service Agent {
   rpc DoRelocateGive(stream RelocateCmdGiveStream) returns (RelocateCmdGiveStatus) {}
   rpc DoRestore(RestoreCmd) returns (stream RestoreCmdStatus) {}
   rpc DoRm(RmCmd) returns (RmCmdStatus) {}
+  rpc DoCheckBackupExists(CheckCmd) returns (CheckCmdStatus) {}
 }
 
 

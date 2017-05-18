@@ -97,3 +97,11 @@ message RmCmdStatus {
   int32 elapsed_time = 1;
   bool errored = 2;
 }
+
+message CheckCmd {
+   string id =1;
+}
+
+message CheckCmdStatus {
+   bool exists  = 1;
+}

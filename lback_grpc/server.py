@@ -26,8 +26,15 @@ class Server(server_pb2_grpc.ServerServicer):
     for agent in self.agents:
      if agent[0].id==agent_id:
          return agent
-  def FindRestoreCandidate(self):
-     return self.agents[0]
+  def FindRestoreCandidate(self, backup):
+     def route_fn( agent ):
+        check_cmd = shared_pb2.CheckCmd(id=backup.id)
+        exists = agent.DoCheckBackupExists(check_cmd)
+        return ( exists, agent, )
+     routed = self.RouteOnAllAgents( route_fn )
+     for ( check_cmd_resp, agent ) in routed:
+       if check_cmd_resp and not (check_cmd_resp.errored):
+         return agent
   def RemoveAgent(self, server_object):
      connection_string = make_connection_string( server_object[0] )
      lback_output("Removing AGENT %s"%(connection_string))
@@ -64,6 +71,10 @@ class Server(server_pb2_grpc.ServerServicer):
     def route_fn(agent ):
        lback_output("RUNNING CHUNKED ITERATOR")
        iterator = chunked_iterator( agent )
+       exists = agent.DoCheckBackupExists( shared_pb2.CheckCmd(
+          id=request.id ))
+       if not exists.errored:
+          shared_pb2.BackupCmdStatus(errored=False)
        backup_res = agent.DoBackup( iterator )
        lback_output("COMPLETED BACKUP")
        return backup_res
@@ -102,8 +113,8 @@ class Server(server_pb2_grpc.ServerServicer):
      
   def RouteRestore(self, request, context):
      lback_output("Received COMMAND RouteRestore")
-     dst_agent = self.FindRestoreCandidate()
      db_backup = lback_backup( request.id )
+     dst_agent = self.FindRestoreCandidate( db_backup )
      restore = Restore( request.id, folder=db_backup.folder )
      def agent_restore_fn(agent):
          return agent.DoRestore( request )
