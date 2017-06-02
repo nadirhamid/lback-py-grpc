@@ -21,6 +21,11 @@ class AgentStub(object):
         request_serializer=shared__pb2.BackupCmdStream.SerializeToString,
         response_deserializer=shared__pb2.BackupCmdStatus.FromString,
         )
+    self.DoShardedBackup = channel.stream_unary(
+        '/lbackgrpc.Agent/DoShardedBackup',
+        request_serializer=shared__pb2.BackupCmdStream.SerializeToString,
+        response_deserializer=shared__pb2.BackupCmdStatus.FromString,
+        )
     self.DoRelocateTake = channel.unary_stream(
         '/lbackgrpc.Agent/DoRelocateTake',
         request_serializer=shared__pb2.RelocateCmdTake.SerializeToString,
@@ -57,6 +62,11 @@ class AgentServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def DoShardedBackup(self, request_iterator, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
   def DoRelocateTake(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -87,6 +97,11 @@ def add_AgentServicer_to_server(servicer, server):
   rpc_method_handlers = {
       'DoBackup': grpc.stream_unary_rpc_method_handler(
           servicer.DoBackup,
+          request_deserializer=shared__pb2.BackupCmdStream.FromString,
+          response_serializer=shared__pb2.BackupCmdStatus.SerializeToString,
+      ),
+      'DoShardedBackup': grpc.stream_unary_rpc_method_handler(
+          servicer.DoShardedBackup,
           request_deserializer=shared__pb2.BackupCmdStream.FromString,
           response_serializer=shared__pb2.BackupCmdStatus.SerializeToString,
       ),

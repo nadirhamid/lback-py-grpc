@@ -47,6 +47,7 @@ class Client( object ):
             lback_output("RESTORE successful")
         else:
             lback_output("RESTORE could not be performed")
+        return reply
     def _run_relocate( self, operation_instance ):
         lback_output("Routing RELOCATE")
         reply = self.server.RouteRelocate( 
@@ -58,6 +59,7 @@ class Client( object ):
            lback_output("RELOCATE successful")
         else:
            lback_output("RELOCATE could not be performed")
+        return reply
     def _run_remove( self, operation_instance, backup ):
         lback_output("Routing REMOVE")
         if operation_instance.args.all:
@@ -77,11 +79,13 @@ class Client( object ):
                 else:
                     lback_output("REMOVE could not be propagated")
     def _run( self, operation_instance, backup ):
+        resp= None
         if isinstance(operation_instance, OperationBackup ):
-            self._run_backup( operation_instance, backup )
+            resp = self._run_backup( operation_instance, backup )
         elif isinstance(operation_instance, OperationRestore ):
-            self._run_restore( operation_instance, backup )
+            resp = self._run_restore( operation_instance, backup )
         elif isinstance(operation_instance, OperationRelocate ):
-            self._run_relocate( operation_instance, backup )
+            resp = self._run_relocate( operation_instance, backup )
         elif isinstance(operation_instance, OperationRm ):
-            self._run_remove( operation_instance, backup )
+            resp = self._run_remove( operation_instance, backup )
+        return resp

@@ -12,7 +12,8 @@ class installsetup(install):
 
 deps = [
    "grpcio==1.0.0",
-   "grpcio-tools==1.2.1"
+   "grpcio-tools==1.2.1",
+   "futures==3.1.1"
 ]
 
 setup(name="LinuxOpenSuseBackupToolGRPC",

@@ -1,5 +1,5 @@
 from lback.backup import Backup
-from lback.utils import lback_backup, lback_backup_chunked_file, lback_backup_remove, lback_output, lback_backup_path
+from lback.utils import lback_backup, lback_backup_chunked_file, lback_backup_remove, lback_output, lback_backup_path, lback_id
 from lback.restore import Restore
 from . import agent_pb2
 from . import agent_pb2_grpc
@@ -14,9 +14,11 @@ class Agent(agent_pb2_grpc.AgentServicer):
     lback_output("Received COMMAND DoBackup")
     request_iterator, iter_copy= tee( request_iterator )
     request = next(iter_copy)
-    folder= lback_backup_path( request.id )
+    full_id = lback_id(request.id, shard=request.shard)
+    backup_object = lback_backup(request.id)
     lback_output("Running backup on %s"%( request.id ))
-    backup = Backup( request.id, folder )
+    lback_output("Running backup on shard %s"%( request.shard ))
+    backup = Backup( full_id, backup_object.folder )
     def backup_chunked_iterator():
         for backup_cmd_chunk in request_iterator:
          yield backup_cmd_chunk.raw_data
@@ -59,8 +61,9 @@ class Agent(agent_pb2_grpc.AgentServicer):
   def DoRestore(self, request, context):
     lback_output("Received COMMAND DoRestore")
     db_backup =lback_backup( request.id )
+     
     try:
-        iterator = lback_backup_chunked_file(db_backup.id)
+        iterator = lback_backup_chunked_file(lback_id(id=db_backup.id, shard=request.shard))
         for restore_file_chunk in iterator:
             lback_output("PACKING RESTORE CHUNK")
             yield shared_pb2.RestoreCmdStatus( 
@@ -81,8 +84,8 @@ class Agent(agent_pb2_grpc.AgentServicer):
     return shared_pb2.RmCmdStatus( errored=False )
   def DoCheckBackupExists(self, request, context):
      lback_output("Received COMMAND DoCheckBackupExists")
-     if os.path.exists( lback_backup_path( request.id ) ):
-       lback_output("BACKUP EXISTS")
+     lback_output("ID %s, SHARD %s"%( request.id, request.shard, ) )
+     if  os.path.exists( lback_backup_path( request.id, request.shard ) ):
        return shared_pb2.CheckCmdStatus(
           errored=False)
      lback_output("BACKUP DOES NOT EXIST")

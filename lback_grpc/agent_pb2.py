@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='agent.proto',
   package='lbackgrpc',
   syntax='proto3',
-  serialized_pb=_b('\n\x0b\x61gent.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\xbf\x03\n\x05\x41gent\x12\x46\n\x08\x44oBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12R\n\x0e\x44oRelocateTake\x12\x1a.lbackgrpc.RelocateCmdTake\x1a .lbackgrpc.RelocateCmdTakeStatus\"\x00\x30\x01\x12X\n\x0e\x44oRelocateGive\x12 .lbackgrpc.RelocateCmdGiveStream\x1a .lbackgrpc.RelocateCmdGiveStatus\"\x00(\x01\x12\x43\n\tDoRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x30\x01\x12\x32\n\x04\x44oRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x12G\n\x13\x44oCheckBackupExists\x12\x13.lbackgrpc.CheckCmd\x1a\x19.lbackgrpc.CheckCmdStatus\"\x00\x42\x1d\n\x12io.grpc.lback.grpcB\x05\x41gentP\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0b\x61gent.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\x8e\x04\n\x05\x41gent\x12\x46\n\x08\x44oBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12M\n\x0f\x44oShardedBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12R\n\x0e\x44oRelocateTake\x12\x1a.lbackgrpc.RelocateCmdTake\x1a .lbackgrpc.RelocateCmdTakeStatus\"\x00\x30\x01\x12X\n\x0e\x44oRelocateGive\x12 .lbackgrpc.RelocateCmdGiveStream\x1a .lbackgrpc.RelocateCmdGiveStatus\"\x00(\x01\x12\x43\n\tDoRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x30\x01\x12\x32\n\x04\x44oRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x12G\n\x13\x44oCheckBackupExists\x12\x13.lbackgrpc.CheckCmd\x1a\x19.lbackgrpc.CheckCmdStatus\"\x00\x42\x1d\n\x12io.grpc.lback.grpcB\x05\x41gentP\x01\x62\x06proto3')
   ,
   dependencies=[shared__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -53,6 +53,11 @@ try:
       """
       self.DoBackup = channel.stream_unary(
           '/lbackgrpc.Agent/DoBackup',
+          request_serializer=shared__pb2.BackupCmdStream.SerializeToString,
+          response_deserializer=shared__pb2.BackupCmdStatus.FromString,
+          )
+      self.DoShardedBackup = channel.stream_unary(
+          '/lbackgrpc.Agent/DoShardedBackup',
           request_serializer=shared__pb2.BackupCmdStream.SerializeToString,
           response_deserializer=shared__pb2.BackupCmdStatus.FromString,
           )
@@ -92,6 +97,11 @@ try:
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
+    def DoShardedBackup(self, request_iterator, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
     def DoRelocateTake(self, request, context):
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
@@ -122,6 +132,11 @@ try:
     rpc_method_handlers = {
         'DoBackup': grpc.stream_unary_rpc_method_handler(
             servicer.DoBackup,
+            request_deserializer=shared__pb2.BackupCmdStream.FromString,
+            response_serializer=shared__pb2.BackupCmdStatus.SerializeToString,
+        ),
+        'DoShardedBackup': grpc.stream_unary_rpc_method_handler(
+            servicer.DoShardedBackup,
             request_deserializer=shared__pb2.BackupCmdStream.FromString,
             response_serializer=shared__pb2.BackupCmdStatus.SerializeToString,
         ),
@@ -166,6 +181,8 @@ try:
     """
     def DoBackup(self, request_iterator, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def DoShardedBackup(self, request_iterator, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def DoRelocateTake(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def DoRelocateGive(self, request_iterator, context):
@@ -189,6 +206,9 @@ try:
     def DoBackup(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     DoBackup.future = None
+    def DoShardedBackup(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    DoShardedBackup.future = None
     def DoRelocateTake(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     def DoRelocateGive(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
@@ -217,6 +237,7 @@ try:
       ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTake.FromString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmd.FromString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmd.FromString,
+      ('lbackgrpc.Agent', 'DoShardedBackup'): shared__pb2.BackupCmdStream.FromString,
     }
     response_serializers = {
       ('lbackgrpc.Agent', 'DoBackup'): shared__pb2.BackupCmdStatus.SerializeToString,
@@ -225,6 +246,7 @@ try:
       ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTakeStatus.SerializeToString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmdStatus.SerializeToString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmdStatus.SerializeToString,
+      ('lbackgrpc.Agent', 'DoShardedBackup'): shared__pb2.BackupCmdStatus.SerializeToString,
     }
     method_implementations = {
       ('lbackgrpc.Agent', 'DoBackup'): face_utilities.stream_unary_inline(servicer.DoBackup),
@@ -233,6 +255,7 @@ try:
       ('lbackgrpc.Agent', 'DoRelocateTake'): face_utilities.unary_stream_inline(servicer.DoRelocateTake),
       ('lbackgrpc.Agent', 'DoRestore'): face_utilities.unary_stream_inline(servicer.DoRestore),
       ('lbackgrpc.Agent', 'DoRm'): face_utilities.unary_unary_inline(servicer.DoRm),
+      ('lbackgrpc.Agent', 'DoShardedBackup'): face_utilities.stream_unary_inline(servicer.DoShardedBackup),
     }
     server_options = beta_implementations.server_options(request_deserializers=request_deserializers, response_serializers=response_serializers, thread_pool=pool, thread_pool_size=pool_size, default_timeout=default_timeout, maximum_timeout=maximum_timeout)
     return beta_implementations.server(method_implementations, options=server_options)
@@ -251,6 +274,7 @@ try:
       ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTake.SerializeToString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmd.SerializeToString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmd.SerializeToString,
+      ('lbackgrpc.Agent', 'DoShardedBackup'): shared__pb2.BackupCmdStream.SerializeToString,
     }
     response_deserializers = {
       ('lbackgrpc.Agent', 'DoBackup'): shared__pb2.BackupCmdStatus.FromString,
@@ -259,6 +283,7 @@ try:
       ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTakeStatus.FromString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmdStatus.FromString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmdStatus.FromString,
+      ('lbackgrpc.Agent', 'DoShardedBackup'): shared__pb2.BackupCmdStatus.FromString,
     }
     cardinalities = {
       'DoBackup': cardinality.Cardinality.STREAM_UNARY,
@@ -267,6 +292,7 @@ try:
       'DoRelocateTake': cardinality.Cardinality.UNARY_STREAM,
       'DoRestore': cardinality.Cardinality.UNARY_STREAM,
       'DoRm': cardinality.Cardinality.UNARY_UNARY,
+      'DoShardedBackup': cardinality.Cardinality.STREAM_UNARY,
     }
     stub_options = beta_implementations.stub_options(host=host, metadata_transformer=metadata_transformer, request_serializers=request_serializers, response_deserializers=response_deserializers, thread_pool=pool, thread_pool_size=pool_size)
     return beta_implementations.dynamic_stub(channel, 'lbackgrpc.Agent', cardinalities, options=stub_options)

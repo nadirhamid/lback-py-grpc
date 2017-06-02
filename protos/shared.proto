@@ -35,6 +35,7 @@ message BackupCmdStream {
   // The location from which the message is sent.
   string id = 1;
   bytes raw_data = 2;
+  string shard = 3;
 }
 message BackupCmd {
   // The location from which the message is sent.
@@ -51,6 +52,7 @@ message RestoreCmd {
   string id = 1;
   string folder = 2;
   bool use_temp_folder = 3;
+  string shard = 4;
 }
 message RestoreCmdStatus {
   // The location from which the message is sent.
@@ -93,6 +95,7 @@ message RmCmd {
   string id = 1;
   string target = 2;
   bool all = 3;
+  string shard = 4;
 }
 
 message RmCmdStatus {
@@ -102,6 +105,7 @@ message RmCmdStatus {
 
 message CheckCmd {
    string id =1;
+   string shard = 2;
 }
 
 message CheckCmdStatus {
