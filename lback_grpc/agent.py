@@ -16,10 +16,9 @@ class Agent(agent_pb2_grpc.AgentServicer):
     request_iterator, iter_copy= tee( request_iterator )
     request = next(iter_copy)
     full_id = lback_id(request.id, shard=protobuf_empty_to_none(request.shard))
-    backup_object = lback_backup(request.id)
     lback_output("Running backup on %s"%( request.id ))
     lback_output("Running backup on shard %s"%( request.shard ))
-    backup = Backup( full_id, backup_object.folder )
+    backup = Backup( full_id, request.folder )
     def backup_chunked_iterator():
         for backup_cmd_chunk in request_iterator:
          yield backup_cmd_chunk.raw_data
@@ -45,8 +44,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
     lback_output("Received COMMAND DoRelocateGive")
     request_iterator, iter_copy = tee( request_iterator )
     request = next(iter_copy)
-    db_backup =lback_backup( request.id )
-    backup = Backup( request.id, db_backup.folder )
+    backup = Backup( request.id, request.folder )
     def relocate_cmd_chunked_iterator():
         for relocate_cmd_chunk in request_iterator:
             lback_output("SAVING RELOCATE BACKUP GIVE CHUNK")
@@ -61,10 +59,8 @@ class Agent(agent_pb2_grpc.AgentServicer):
 
   def DoRestore(self, request, context):
     lback_output("Received COMMAND DoRestore")
-    db_backup =lback_backup( request.id )
-     
     try:
-        iterator = lback_backup_chunked_file(lback_id(id=db_backup.id, shard=protobuf_empty_to_none(request.shard)))
+        iterator = lback_backup_chunked_file(lback_id(id=request.id, shard=protobuf_empty_to_none(request.shard)))
         for restore_file_chunk in iterator:
             lback_output("PACKING RESTORE CHUNK")
             yield shared_pb2.RestoreCmdStatus( 

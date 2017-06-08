@@ -102,7 +102,7 @@ class Server(server_pb2_grpc.ServerServicer):
            chunked_file = lback_backup_chunked_file( request.temp_id )
            for backup_file_chunk in chunked_file:
               lback_output("Packing CHUNK")
-              yield shared_pb2.BackupCmdStream( id=request.id,raw_data=backup_file_chunk )
+              yield shared_pb2.BackupCmdStream( id=request.id,folder=backup.folder,raw_data=backup_file_chunk )
         def route_fn(agent ):
            lback_output("RUNNING CHUNKED ITERATOR")
            iterator = chunked_iterator( agent )
@@ -157,9 +157,15 @@ class Server(server_pb2_grpc.ServerServicer):
      lback_output("Received COMMAND RouteRelocate")
      src_agent = self.FindAgent( request.src )
      dst_agent = self.FindAgent( request.dst )
+     backup = lback_backup( request.id )
      iterator = None
      def agent_take_fn(agent):
-         return agent[1].DoRelocateTake( request )
+         return agent[1].DoRelocateTake( 
+                shared_pb2.RelocateCmdTake(
+                    folder=backup.folder,
+                    id=request.id,
+                    src=request.src, 
+                    dst=request.dst))
      def agent_give_fn():
          return agent[1].DoRelocateGive(chunked_iterator())
      def give_loop_all(iterator):
@@ -172,7 +178,10 @@ class Server(server_pb2_grpc.ServerServicer):
              yield None
          else:
              for relocate_take_chunk in  iterator:
-                 yield relocate_take_chunk
+                 yield shared_pb2.RelocateCmdGiveStream(
+                        id=relocate_take_chunk.id,
+                        raw_data=relocate_take_chunk.raw_data,
+                        folder=backup.folder )
      iterator = self.RouteOnAgent( dst_agent, agent_give_fn )
      if not iterator:
          return shared_pb2.RelocateCmdStatus(errored=True)

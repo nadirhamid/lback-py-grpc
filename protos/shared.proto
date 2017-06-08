@@ -36,6 +36,7 @@ message BackupCmdStream {
   string id = 1;
   bytes raw_data = 2;
   string shard = 3;
+  string folder = 4;
 }
 message BackupCmd {
   // The location from which the message is sent.
@@ -69,6 +70,7 @@ message RelocateCmd {
 
 message RelocateCmdTake {
   string id = 1;
+  string folder = 2;
 }
 
 message RelocateCmdGiveStream {
