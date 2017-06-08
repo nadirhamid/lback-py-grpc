@@ -58,7 +58,9 @@ class Server(server_pb2_grpc.ServerServicer):
      return result
 
   def RouteOnAllAgents(self, agent_fn):
-    agents = self.agents
+    def filter_fn( agent ):
+       return lback_agent_is_available( agent[0] )
+    agents = filter( filter_fn, self.agents )
     lback_output("ROUTE ON ALL AGENTS")
     lback_output(agents)
     for agent_response in self.RouteToTheseAgents(agents, agent_fn):
