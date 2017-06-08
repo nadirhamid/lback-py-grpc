@@ -5,6 +5,7 @@ from . import agent_pb2
 from . import agent_pb2_grpc
 from . import shared_pb2
 from . import shared_pb2_grpc
+from . import protobuf_empty_to_none
 from itertools import tee
 from traceback import print_exc
 import os
@@ -14,7 +15,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
     lback_output("Received COMMAND DoBackup")
     request_iterator, iter_copy= tee( request_iterator )
     request = next(iter_copy)
-    full_id = lback_id(request.id, shard=request.shard)
+    full_id = lback_id(request.id, shard=protobuf_empty_to_none(request.shard))
     backup_object = lback_backup(request.id)
     lback_output("Running backup on %s"%( request.id ))
     lback_output("Running backup on shard %s"%( request.shard ))
@@ -63,7 +64,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
     db_backup =lback_backup( request.id )
      
     try:
-        iterator = lback_backup_chunked_file(lback_id(id=db_backup.id, shard=request.shard))
+        iterator = lback_backup_chunked_file(lback_id(id=db_backup.id, shard=protobuf_empty_to_none(request.shard)))
         for restore_file_chunk in iterator:
             lback_output("PACKING RESTORE CHUNK")
             yield shared_pb2.RestoreCmdStatus( 
@@ -76,7 +77,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
   def DoRm(self, request, context):
     lback_output("Received COMMAND DoRm")
     try:
-       lback_backup_remove( request.id )
+       lback_backup_remove( request.id, shard=protobuf_empty_to_none(request.shard) )
     except Exception,ex:
        print_exc(ex)
        return shared_pb2.RmCmdStatus( errored=True )
@@ -85,7 +86,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
   def DoCheckBackupExists(self, request, context):
      lback_output("Received COMMAND DoCheckBackupExists")
      lback_output("ID %s, SHARD %s"%( request.id, request.shard, ) )
-     if  os.path.exists( lback_backup_path( request.id, request.shard ) ):
+     if  os.path.exists( lback_backup_path( request.id, shard=protobuf_empty_to_none(request.shard) ) ):
        return shared_pb2.CheckCmdStatus(
           errored=False)
      lback_output("BACKUP DOES NOT EXIST")

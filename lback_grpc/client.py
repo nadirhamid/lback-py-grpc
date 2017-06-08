@@ -62,22 +62,27 @@ class Client( object ):
         return reply
     def _run_remove( self, operation_instance, backup ):
         lback_output("Routing REMOVE")
+
+        def handle_replies( replies ):
+            for reply in replies:
+                if not reply.errored:
+                    lback_output("REMOVE propagated")
+                else:
+                    lback_output("REMOVE could not be propagated")
         if operation_instance.args.all:
              replies = self.server.RouteRm( 
                  shared_pb2.RmCmd( 
                     id=backup.id,
                     all=operation_instance.args.all))
+             handle_replies(replies)
+                
         else:
              target = operation_instance.args.target
              replies = self.server.RouteRm( 
                  shared_pb2.RmCmd( 
                     id=backup.id,
                      target=target))
-             for reply in replies:
-                if not reply.errored:
-                    lback_output("REMOVE propagated")
-                else:
-                    lback_output("REMOVE could not be propagated")
+             handle_replies( replies )
     def _run( self, operation_instance, backup ):
         resp= None
         if isinstance(operation_instance, OperationBackup ):

@@ -80,6 +80,7 @@ class Server(server_pb2_grpc.ServerServicer):
       dst_agent = self.FindRestoreCandidate( db_backup, shard=str( shard_count ) )
       reply = self.RouteOnAgent( dst_agent, route_fn)
       yield reply
+      shard_count += 1
 
   def RouteOnAgent(self, agent, agent_fn):
      lback_output("ROUTE ON AGENT")
@@ -217,10 +218,10 @@ class Server(server_pb2_grpc.ServerServicer):
                  id=request.id,
                  use_temp_folder=request.use_temp_folder,
                  folder=request.folder,
-                 shard=str( shard_count[ 0 ] ) )
+                 shard=str( shard_count[0] ) )
              return agent[1].DoRestore( cmd_request )
          def chunked_iterator():
-             agent_iterator = self.RouteWithShard(shard_count[ 0 ], shard_total, db_backup, agent_restore_fn)
+             shard_count[0], agent_iterator = self.RouteWithShard(shard_count[0], shards_total, db_backup, agent_restore_fn)
              for restore_cmd_chunk in agent_iterator:
                   lback_output("Receiving CHUNK")
                   if not restore_cmd_chunk:
@@ -239,17 +240,19 @@ class Server(server_pb2_grpc.ServerServicer):
       id = request.id
       db_backup = lback_backup(id)
       def do_shared_rm():
+          lback_output("Remove with DISTRIBUTION STRATEGY shared")
           def route_fn(agent):
               status = agent[1].DoRm(request)
-              yield status
+              return status
           iterator = self.RouteOnAllAgents( route_fn )
           for rm_cmd_reply in iterator:
-             if not rm_cmd_reply:
+             if rm_cmd_reply is None:
                 yield shared_pb2.RmCmdStatus(errored=True)
              else:
                 lback_output("COMPLETED REMOVE")
-                yield shared_pb2.RmCmdStatus(errored=True)
+                yield rm_cmd_reply
       def do_sharded_rm():
+          lback_output("Remove with DISTRIBUTION STRATEGY sharded")
           shard_count = [ 0 ]
           shard_total = db_backup.shard_total
           def route_fn(agent):
@@ -264,15 +267,21 @@ class Server(server_pb2_grpc.ServerServicer):
                 yield shared_pb2.RmCmdStatus(errored=True)
              else:
                 lback_output("COMPLETED REMOVE")
-                yield shared_pb2.RmCmdStatus(errored=True)
+                yield rm_cmd_reply
       def handle_all_rm():
           if db_backup.distribution_strategy=="shared":
              iterator = do_shared_rm()
           elif db_backup.distribution_strategy=="sharded":
              iterator = do_sharded_rm()
+          for cmd_result in iterator:
+             if cmd_result.errored:
+                yield cmd_result
+          yield shared_pb2.RmCmdStatus( errored=False )
       def handle_target_rm():
           lback_output("NOT IMPLEMENTED")
           yield shared_pb2.RmCmdStatus(errored=True)
+      iterator = handle_all_rm()
       if not all:
-          handle_target_rm()
-      handle_all_rm()
+          iterator = handle_target_rm()
+      for cmd_result in iterator:
+           yield cmd_result
