@@ -5,26 +5,22 @@ from . import server_pb2
 from . import server_pb2_grpc
 from . import shared_pb2
 from . import shared_pb2_grpc
+from . import server_connection
 from lback.operation_backup import OperationBackup
 from lback.operation_restore import OperationRestore
 from lback.operation_mv import OperationMv
 from lback.operation_relocate import OperationRelocate
 from lback.operation_rm import OperationRm
 from lback.restore import Restore, RestoreException
-from lback.utils import lback_settings, lback_output, lback_id_temp, lback_backup_path
+from lback.utils import lback_settings, lback_output, lback_id_temp, lback_backup_path, lback_make_temp_backup, lback_backup_remove,  lback_backup_move
 
 class Client( object ):
     def __init__(self):
-        settings = lback_settings()
-        channel = grpc.insecure_channel(settings['server']['host']+":"+settings['server']['port'])
-        self.server =  server_pb2_grpc.ServerStub( channel )
+        self.server = server_connection()
     def _run_backup( self, operation_instance, backup ):
         lback_output("Routing BACKUP")
         lback_output("Creating TEMP backup snapshot")
-        temp_backup_id = lback_id_temp( backup.id )
-        real_backup_path = lback_backup_path( backup.id )
-        temp_backup_path = lback_backup_path( temp_backup_id )
-        shutil.move( real_backup_path, temp_backup_path )
+        temp_backup_id = lback_make_temp_backup( backup )
         msg = shared_pb2.BackupCmd(
            id=backup.id,
            temp_id=temp_backup_id )
@@ -34,8 +30,6 @@ class Client( object ):
                 lback_output("BACKUP propagated")
            else:
                 lback_output("BACKUP could not be propagated")
-        lback_output("Removing TEMP backup")
-        os.remove( temp_backup_path )
     def _run_restore( self, operation_instance, backup ):
         lback_output("Routing RESTORE")
         cmd = shared_pb2.RestoreCmd( id=backup.id )

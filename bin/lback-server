@@ -20,9 +20,17 @@ def serve( addr ):
   def schedule_backups():
        lback_output("SCHEDULING BACKUPS")
        backups = lback_backups()
+       def schedule_shared_backup():
+           lback_server.ScheduleSharedBackup( backup )
+       def schedule_sharded_backup():
+           ## not implmented
+           pass
+
        for backup in backups:
-           lback_server.RouteBackup( shared_pb2.BackupCmd( 
-                id=backup.id ) )
+           if backup.distribution_strategy == "shared":
+               schedule_shared_backup()
+           elif backup.distribution_strategy == "sharded":
+               schedule_sharded_backup()
   def check_for_agent_updates():
        lback_output("CHECKING FOR NEW AGENTS")
        server_agents = lback_server.agents
@@ -42,7 +50,7 @@ def serve( addr ):
   try:
     while True:
        check_for_agent_updates()
-       ##schedule_backups()
+       schedule_backups()
        time.sleep( 5.0 )
       
   except KeyboardInterrupt:

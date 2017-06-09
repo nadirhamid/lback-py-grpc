@@ -42,6 +42,7 @@ message BackupCmd {
   // The location from which the message is sent.
   string id = 1;
   string temp_id = 2;
+  repeated string agent_ids = 3;
 }
 
 message BackupCmdStatus {
@@ -54,6 +55,7 @@ message RestoreCmd {
   string folder = 2;
   bool use_temp_folder = 3;
   string shard = 4;
+  bool skip_run = 5;
 }
 message RestoreCmdStatus {
   // The location from which the message is sent.

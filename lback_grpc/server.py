@@ -5,9 +5,11 @@ from . import server_pb2
 from . import server_pb2_grpc
 from . import shared_pb2
 from . import shared_pb2_grpc
+from .server_scheduler import ServerScheduler
+from .sharded_iterator import ShardedIterator
 from traceback import print_exc
 
-from lback.utils import lback_agents, lback_backup_chunked_file, lback_output, lback_backup, lback_agent_is_available, lback_backup_shard_size, lback_backup_shard_start_end
+from lback.utils import lback_agents, lback_backup_chunked_file, lback_output, lback_backup, lback_agent_is_available, lback_backup_shard_size, lback_backup_shard_start_end, lback_backup_remove
 from lback.backup import BackupObject
 from lback.restore import Restore
 
@@ -22,12 +24,41 @@ def cmd_response_handler(cmd_response):
    return cmd_response
 
 
-class Server(server_pb2_grpc.ServerServicer):
+class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
   def __init__(self):
     agent_objects = lback_agents()
     self.agents = [] ## STUBS and CHANNELS
+    self.locked = False
     for agent_object in agent_objects:
        self.AddAgentByDbObject(agent_object)
+
+  def Lock(self):
+     lback_output("LOCKING SERVER")
+     self.locked = True
+  def Unlock(self):
+     lback_output("UNLOCKING SERVER")
+     self.locked =False
+
+  
+  def WithLockStream( fn ):
+    def locked_fn( *args ):
+            self = args[0]
+            self.Lock()
+            yielded_results = fn( *args )
+            for result in yielded_results:
+                yield result
+            self.Unlock()
+    return locked_fn
+
+  def WithLock( fn ):
+    def locked_fn( *args ):
+            self = args[ 0 ]
+            self.Lock()
+            result = fn( *args )
+            self.Unlock()
+            return result
+    return locked_fn
+
 
   def AddAgentByDbObject(self, agent_object):
      connection_string = make_connection_string( agent_object )
@@ -41,6 +72,9 @@ class Server(server_pb2_grpc.ServerServicer):
   def FindRestoreCandidate(self, backup, shard=None):
      def route_fn( agent ):
         check_cmd = shared_pb2.CheckCmd(id=backup.id, shard=shard)
+        lback_output(
+            "CHECKING IF BACKUP EXISTS ID: %s, SHARD: %s ON AGENT %s"%( backup.id, shard, make_connection_string(agent[0]) ) 
+        )
         exists = agent[1].DoCheckBackupExists(check_cmd)
         return ( exists, agent, )
      routed = self.RouteOnAllAgents( route_fn )
@@ -65,10 +99,11 @@ class Server(server_pb2_grpc.ServerServicer):
     lback_output(agents)
     for agent_response in self.RouteToTheseAgents(agents, agent_fn):
         yield agent_response
+ 
   def RouteToTheseAgents(self, agents, agent_fn):
      for agent in agents:
        yield self.RouteToAgent(agent, agent_fn)
-  def GetEveryAgentPossible(self):
+  def FetchEveryAgentPossible(self):
      agents = self.agents
      def filter_fn(agent):
         if lback_agent_is_available( agent[0] ):
@@ -76,13 +111,23 @@ class Server(server_pb2_grpc.ServerServicer):
         return False
      return filter( filter_fn, agents )
 
-  def RouteWithShard(self, shard_count, shard_total, db_backup, route_fn):
-    while shard_count != shard_total:
+  def FetchAllAgentsByIds(self, ids):
+     agents = self.agents
+     def filter_fn(agent):
+         if ( agent[0].id in ids ) and  ( lback_agent_is_available( agent[ 0 ] ) ):
+            return True
+         return False
+     return filter( filter_fn, agents )
+
+  def RouteWithShard(self, sharded_iterator, db_backup, route_fn):
+    while sharded_iterator.get_count() != sharded_iterator.get_total():
+      shard_count = sharded_iterator.get_count()
       lback_output("RECEIVING SHARD %s"%(shard_count,))
       dst_agent = self.FindRestoreCandidate( db_backup, shard=str( shard_count ) )
       reply = self.RouteOnAgent( dst_agent, route_fn)
-      yield reply
-      shard_count += 1
+      for cmd_response in reply:
+        yield cmd_response
+      sharded_iterator.increment_count()
 
   def RouteOnAgent(self, agent, agent_fn):
      lback_output("ROUTE ON AGENT")
@@ -94,9 +139,13 @@ class Server(server_pb2_grpc.ServerServicer):
      lback_output( reply )
      return reply
 
+  @WithLockStream
   def RouteBackup(self, request, context):
     lback_output("Received COMMAND RouteBackup")
     backup = BackupObject.find_backup(request.id)
+    agents = self.FetchAllAgentsByIds( request.agent_ids )
+    if not len( request.agent_ids ) > 0:
+       agents = self.FetchEveryAgentPossible()
     def do_shared_distribution():
         lback_output("Backup with DISTRIBUTION STRATEGY shared")
         def chunked_iterator(agent):
@@ -115,7 +164,7 @@ class Server(server_pb2_grpc.ServerServicer):
            backup_res = agent[1].DoBackup( iterator )
            lback_output("COMPLETED BACKUP")
            return backup_res
-        for cmd_response in self.RouteOnAllAgents( route_fn ) :
+        for cmd_response in self.RouteToTheseAgents( agents, route_fn ):
             yield cmd_response_handler(cmd_response)
     def do_sharded_distribution():
         lback_output("Backup with DISTRIBUTION STRATEGY sharded")
@@ -142,7 +191,7 @@ class Server(server_pb2_grpc.ServerServicer):
            shard_count[ 0 ] += 1
            return backup_res
 
-        agents_possible = self.GetEveryAgentPossible()
+        agents_possible = self.FetchEveryAgentPossible()
         total_shards = len( agents_possible )
         backup.update_field("shards_total", total_shards)
         sharded_backup_size = lback_backup_shard_size( request.temp_id, total_shards )
@@ -154,7 +203,10 @@ class Server(server_pb2_grpc.ServerServicer):
         iterator = do_shared_distribution()
     for cmd_response in iterator:
         yield cmd_response
+    lback_output("REMOVING TEMP BACKUP")
+    lback_backup_remove(request.temp_id)
 
+  @WithLock
   def RouteRelocate(self, request, context):  
      lback_output("Received COMMAND RouteRelocate")
      src_agent = self.FindAgent( request.src )
@@ -190,15 +242,16 @@ class Server(server_pb2_grpc.ServerServicer):
      give_loop_all(iterator)
      lback_output("COMPLETED RELOCATE")
      return shared_pb2.RelocateCmdStatus(errored=False)
-     
+ 
+  @WithLock    
   def RouteRestore(self, request, context):
      lback_output("Received COMMAND RouteRestore")
      db_backup = lback_backup( request.id )
      folder = request.folder
-     if request.use_temp_folder:
-        restore = Restore( request.id, folder=request.folder )
-     else:
-        restore = Restore( request.id, folder=db_backup.folder )
+     restore_kwargs = dict( 
+         folder = ( request.folder if request.use_temp_folder else db_backup.folder ),
+         run = not request.skip_run ) 
+     restore = Restore( request.id, **restore_kwargs )
      def do_restore(iterator):
         restore.run_chunked(iterator)
         return shared_pb2.RestoreCmdStatus(
@@ -220,8 +273,9 @@ class Server(server_pb2_grpc.ServerServicer):
          return do_restore( chunked_iterator() )
      def do_sharded_restore():
          lback_output("RUNNING SHARDED RESTORE")
-         shard_count = [ 0 ]
+         shard_count = 0
          shards_total = db_backup.shards_total
+         sharded_iterator = ShardedIterator( shard_count, shards_total )
          lback_output("TOTAL SHARDS ARE %s"%(shards_total,))
 
          def agent_restore_fn(agent):
@@ -229,10 +283,11 @@ class Server(server_pb2_grpc.ServerServicer):
                  id=request.id,
                  use_temp_folder=request.use_temp_folder,
                  folder=request.folder,
-                 shard=str( shard_count[0] ) )
-             return agent[1].DoRestore( cmd_request )
+                 shard=str( sharded_iterator.get_count() ) )
+             for reply in  agent[1].DoRestore( cmd_request ):
+                yield reply
          def chunked_iterator():
-             shard_count[0], agent_iterator = self.RouteWithShard(shard_count[0], shards_total, db_backup, agent_restore_fn)
+             agent_iterator = self.RouteWithShard(sharded_iterator, db_backup, agent_restore_fn)
              for restore_cmd_chunk in agent_iterator:
                   lback_output("Receiving CHUNK")
                   if not restore_cmd_chunk:
@@ -244,6 +299,7 @@ class Server(server_pb2_grpc.ServerServicer):
             shared=do_shared_restore,
             sharded=do_sharded_restore)
 
+  @WithLockStream
   def RouteRm(self, request, context):
       lback_output("Received COMMAND RouteRm")
       all = request.all
