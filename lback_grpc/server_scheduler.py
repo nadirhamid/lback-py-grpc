@@ -24,10 +24,16 @@ class ServerScheduler(object):
         def map_fn( agent ):
             return agent[0].id
         needs_scheduling = map(map_fn, filter(filter_fn, self.agents))
+        if not len( needs_scheduling ) > 0:
+           return
 
-        server.RouteRestore(shared_pb2.RestoreCmd(
+        reply = server.RouteRestore(shared_pb2.RestoreCmd(
             id=backup_obj.id,
             skip_run=True))
+        if reply.errored:
+            lback_output("COULD NOT DO SCHEDULED BACKUP PROPAGATION")
+            lback_output("EITHER NO AGENTS HAVE THIS BACKUP OR AN ERROR OCCURED")
+            return
 
         lback_output("LOCAL SCHEDULED RESTORE COMPLETE")
         lback_output("MOVING SCHEDULED PARTITION")

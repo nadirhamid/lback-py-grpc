@@ -8,6 +8,7 @@ import argparse
 from lback_grpc import server_pb2_grpc
 from lback_grpc import shared_pb2
 from lback_grpc.server import Server
+from lback_grpc.agent_server_object import AgentServerObject
 from lback.utils import lback_settings, lback_agents, lback_output, lback_backups
 
 def serve( addr ):
@@ -34,7 +35,7 @@ def serve( addr ):
   def check_for_agent_updates():
        lback_output("CHECKING FOR NEW AGENTS")
        server_agents = lback_server.agents
-       db_agents = lback_agents()
+       db_agents = lback_agents(transform_cls=AgentServerObject)
        for server_agent in server_agents:
           def db_agent_filter( db_agent ):
              if db_agent.id == server_agent[0].id:
@@ -47,6 +48,9 @@ def serve( addr ):
             registered_agent = lback_server.FindAgent(agent_object.id)
             if not registered_agent:
                 lback_server.AddAgentByDbObject(agent_object)
+            lback_output("DETERMINING LATENCY OF AGENT")
+            agent_object.determine_latency()
+            lback_output("DETERMINED LATENCY IS %s"%( agent_object.get_latency() ))
   try:
     while True:
        check_for_agent_updates()

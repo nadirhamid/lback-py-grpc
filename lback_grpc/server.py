@@ -7,6 +7,7 @@ from . import shared_pb2
 from . import shared_pb2_grpc
 from .server_scheduler import ServerScheduler
 from .sharded_iterator import ShardedIterator
+from .agent_server_object import AgentServerObject
 from traceback import print_exc
 
 from lback.utils import lback_agents, lback_backup_chunked_file, lback_output, lback_backup, lback_agent_is_available, lback_backup_shard_size, lback_backup_shard_start_end, lback_backup_remove
@@ -26,7 +27,7 @@ def cmd_response_handler(cmd_response):
 
 class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
   def __init__(self):
-    agent_objects = lback_agents()
+    agent_objects = lback_agents(transform_cls=AgentServerObject)
     self.agents = [] ## STUBS and CHANNELS
     self.locked = False
     for agent_object in agent_objects:
@@ -70,17 +71,29 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
      if agent[0].id==agent_id:
          return agent
   def FindRestoreCandidate(self, backup, shard=None):
-     def route_fn( agent ):
-        check_cmd = shared_pb2.CheckCmd(id=backup.id, shard=shard)
-        lback_output(
-            "CHECKING IF BACKUP EXISTS ID: %s, SHARD: %s ON AGENT %s"%( backup.id, shard, make_connection_string(agent[0]) ) 
-        )
-        exists = agent[1].DoCheckBackupExists(check_cmd)
-        return ( exists, agent, )
-     routed = self.RouteOnAllAgents( route_fn )
-     for ( check_cmd_resp, agent ) in routed:
-       if check_cmd_resp and not (check_cmd_resp.errored):
-         return agent
+     def filter_fn( agent ):
+        if not lback_agent_is_available( agent[0] ):
+           return False
+        def agent_fn(agent):
+            check_cmd = shared_pb2.CheckCmd(id=backup.id, shard=shard)
+            lback_output(
+                "CHECKING IF BACKUP EXISTS ID: %s, SHARD: %s ON AGENT %s"%( backup.id, shard, make_connection_string(agent[0]) ) 
+            )
+            exists = agent[1].DoCheckBackupExists(check_cmd)
+            return exists
+        reply = self.RouteToAgent( agent, agent_fn )
+        return not reply.errored
+     def agent_key_getter( agent ):
+        return agent[0].latency
+
+     filtered = filter( filter_fn, self.agents )
+     if not len( filtered ) > 0:
+        return None
+     lback_output("DETERMINING BEST AGENT BY LATENCY")
+     by_latency = sorted(filtered, key=agent_key_getter)
+     lback_output("BEST AGENT FOR RESTORE IS %s"%( make_connection_string( by_latency[0][0] ) ))
+     return by_latency[ 0 ]
+
   def RemoveAgent(self, server_object):
      connection_string = make_connection_string( server_object[0] )
      lback_output("Removing AGENT %s"%(connection_string))
@@ -260,6 +273,9 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
      def do_shared_restore():
          lback_output("RUNNING SHARED RESTORE")
          dst_agent = self.FindRestoreCandidate( db_backup )
+         if not dst_agent:
+            return shared_pb2.RestoreCmdStatus(
+                errored=True)
          def agent_restore_fn(agent):
              return agent[1].DoRestore( request )
          def chunked_iterator():
