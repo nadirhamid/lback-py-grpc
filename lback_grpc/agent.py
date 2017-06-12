@@ -55,8 +55,8 @@ class Agent(agent_pb2_grpc.AgentServicer):
             pass
     except Exception,ex:
         print_exc(ex)
-        return shared_pb2.RelocateCmdStatus(errored=True )
-    return shared_pb2.RelocateCmdStatus(errored=False)
+        return shared_pb2.RelocateCmdGiveStatus(errored=True )
+    return shared_pb2.RelocateCmdGiveStatus(errored=False)
 
   def DoRestore(self, request, context):
     lback_output("Received COMMAND DoRestore")
