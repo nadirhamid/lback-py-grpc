@@ -34,7 +34,11 @@ class Client( object ):
         lback_output("Routing RESTORE")
         cmd = shared_pb2.RestoreCmd( id=backup.id )
         if operation_instance.args.folder:
-            cmd = shared_pb2.RestoreCmd( id=backup.id, use_temp_folder=True, folder=operation_instance.args.folder ) 
+            cmd = shared_pb2.RestoreCmd( 
+                id=backup.id, 
+                use_temp_folder=True, 
+                folder=operation_instance.args.folder,
+                target=operation_instance.args.target ) 
         reply = self.server.RouteRestore( 
             cmd )
         if not reply.errored:

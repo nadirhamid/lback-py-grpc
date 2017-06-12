@@ -56,6 +56,7 @@ message RestoreCmd {
   bool use_temp_folder = 3;
   string shard = 4;
   bool skip_run = 5;
+  string target = 6;
 }
 message RestoreCmdStatus {
   // The location from which the message is sent.
