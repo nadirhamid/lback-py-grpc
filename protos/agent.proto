@@ -38,6 +38,7 @@ package lbackgrpc;
 // Interface exported by the server.
 service Agent {
   rpc DoBackup(stream BackupCmdStream) returns (BackupCmdStatus) {}
+  rpc DoBackupAccept(stream BackupCmdAccept) returns (BackupAcceptCmdStatus) {}
   rpc DoShardedBackup(stream BackupCmdStream) returns (BackupCmdStatus) {}
   rpc DoRelocateTake(RelocateCmdTake) returns (stream RelocateCmdTakeStatus) {}
   rpc DoRelocateGive(stream RelocateCmdGiveStream) returns (RelocateCmdGiveStatus) {}

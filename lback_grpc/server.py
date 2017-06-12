@@ -307,7 +307,7 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
                else:
                   yield shared_pb2.RestoreAcceptCmd(
                      id=request.id,
-                     folder=request.folder,
+                     folder=restore_kwargs['folder'],
                      raw_data=restore_cmd_chunk.raw_data)
          return do_restore( chunked_iterator() )
      def do_sharded_restore():
@@ -321,7 +321,7 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
              cmd_request = shared_pb2.RestoreCmd(
                  id=request.id,
                  use_temp_folder=request.use_temp_folder,
-                 folder=request.folder,
+                 folder=restore_kwargs['folder'],
                  shard=str( sharded_iterator.get_count() ) )
              for reply in  agent[1].DoRestore( cmd_request ):
                 yield reply

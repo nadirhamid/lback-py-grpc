@@ -49,6 +49,16 @@ message BackupCmdStatus {
   int32 elapsed_time = 1;
   bool errored = 2;
 }
+
+message BackupCmdAccept {
+  string folder = 1;
+}
+
+message BackupCmdAcceptStatus {
+  int32 elapsed_time = 1;
+  bool errored = 2;
+}
+
 message RestoreCmd {
   // The location from which the message is sent.
   string id = 1;

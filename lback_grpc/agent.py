@@ -32,6 +32,9 @@ class Agent(agent_pb2_grpc.AgentServicer):
     lback_output("BACKUP COMPLETE")
     return shared_pb2.BackupCmdStatus( errored=False )
 
+  def DoBackupAccept(self, request, context):
+    lback_output("Received COMMAND DoBackupAccept")
+
   def DoRelocateTake(self, request, context):
     lback_output("Received COMMAND DoRelocateTake")
     lback_output("ID %s, SHARD %s"%( request.id, request.shard, ) )
