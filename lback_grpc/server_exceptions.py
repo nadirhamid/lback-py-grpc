@@ -1,0 +1,3 @@
+
+class ServerAgentNotFoundException(Exception):
+   pass

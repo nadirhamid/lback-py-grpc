@@ -63,6 +63,18 @@ message RestoreCmdStatus {
   bytes raw_data = 2;
   bool errored = 3;
 }
+
+message RestoreAcceptCmd {
+   string id = 1;
+   bytes raw_data = 2; 
+   string folder = 3;
+}
+
+message RestoreAcceptCmdStatus {
+  int32 elapsed_time = 1;
+  bool errored = 2;
+}
+
 message RelocateCmd {
   // The location from which the message is sent.
   string id = 1;

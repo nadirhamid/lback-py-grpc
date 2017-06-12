@@ -78,6 +78,22 @@ class Agent(agent_pb2_grpc.AgentServicer):
         print_exc(ex)
         yield shared_pb2.RestoreCmdStatus( errored=True )
 
+  def DoRestoreAccept(self, request_iterator, context):
+    lback_output("Received COMMAND DoRestoreAccept")
+    request_iterator, iter_copy= tee( request_iterator )
+    request = next(iter_copy)
+    try:
+       restore =Restore( request.id, folder=request.folder )
+       restore.run_chunked(request_iterator)
+    except Exception,ex:
+       print_exc(ex)
+       return shared_pb2.RestoreAcceptCmdStatus(
+            errored=True)
+    return shared_pb2.RestoreAcceptCmdStatus(
+            errored=False)
+
+
+
   def DoRm(self, request, context):
     lback_output("Received COMMAND DoRm")
     try:
@@ -87,6 +103,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
        return shared_pb2.RmCmdStatus( errored=True )
     lback_output("REMOVE COMPLETE")
     return shared_pb2.RmCmdStatus( errored=False )
+
   def DoCheckBackupExists(self, request, context):
      lback_output("Received COMMAND DoCheckBackupExists")
      lback_output("ID %s, SHARD %s"%( request.id, request.shard, ) )

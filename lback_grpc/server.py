@@ -7,6 +7,7 @@ from . import shared_pb2
 from . import shared_pb2_grpc
 from . import protobuf_empty_to_none
 from .server_scheduler import ServerScheduler
+from .server_exceptions import ServerAgentNotFoundException
 from .sharded_iterator import ShardedIterator
 from .agent_server_object import AgentServerObject
 from traceback import print_exc
@@ -132,6 +133,16 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
             return True
          return False
      return filter( filter_fn, agents )
+
+  def FetchAgentById(self, id):
+     def filter_fn(agent):
+         if ( agent[0].id == id ):
+            return True
+         return False
+     found_agents = filter( filter_fn, self.agents )
+     if not len( found_agents ) > 0:
+        raise ServerAgentNotFoundException("Agent was not found.")
+     return found_agents[ 0 ]
 
   def RouteWithShard(self, sharded_iterator, db_backup, route_fn):
     while sharded_iterator.get_count() != sharded_iterator.get_total():
@@ -260,11 +271,20 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
      lback_output("Received COMMAND RouteRestore")
      db_backup = lback_backup( request.id )
      folder = request.folder
+     target = request.target
      restore_kwargs = dict( 
          folder = ( request.folder if request.use_temp_folder else db_backup.folder ),
          run = not request.skip_run ) 
      restore = Restore( request.id, **restore_kwargs )
+
      def do_restore(iterator):
+         def agent_restore_accept_fn(agent):
+            return agent.DoRestoreAccept(iterator)
+
+        if request.target:
+            target_agent = self.FetchAgentById(target)
+            result = self.RouteOnAgent(target_agent, agent_restore_accept_fn)
+            return shared_pb2.RestoreCmdStatus(errored=result.errored)
         restore.run_chunked(iterator)
         return shared_pb2.RestoreCmdStatus(
             errored=False)
@@ -284,7 +304,10 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
                if not restore_cmd_chunk:
                   yield None
                else:
-                  yield restore_cmd_chunk.raw_data
+                  yield shared_pb2.RestoreAcceptCmd(
+                     id=request.id,
+                     folder=request.folder,
+                     raw_data=restore_cmd_chunk.raw_data)
          return do_restore( chunked_iterator() )
      def do_sharded_restore():
          lback_output("RUNNING SHARDED RESTORE")
@@ -308,7 +331,10 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
                   if not restore_cmd_chunk:
                       yield None
                   else:
-                      yield restore_cmd_chunk.raw_data
+                     yield shared_pb2.RestoreAcceptCmd(
+                     id=request.id,
+                     folder=request.folder,
+                     raw_data=restore_cmd_chunk.raw_data)
          return do_restore(chunked_iterator())
      return do_distribution_switch_return(db_backup.distribution_strategy, 
             shared=do_shared_restore,
