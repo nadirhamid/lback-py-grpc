@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='shared.proto',
   package='lbackgrpc',
   syntax='proto3',
-  serialized_pb=_b('\n\x0cshared.proto\x12\tlbackgrpc\"N\n\x0f\x42\x61\x63kupCmdStream\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\r\n\x05shard\x18\x03 \x01(\t\x12\x0e\n\x06\x66older\x18\x04 \x01(\t\";\n\tBackupCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0f\n\x07temp_id\x18\x02 \x01(\t\x12\x11\n\tagent_ids\x18\x03 \x03(\t\"8\n\x0f\x42\x61\x63kupCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"b\n\nRestoreCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x17\n\x0fuse_temp_folder\x18\x03 \x01(\x08\x12\r\n\x05shard\x18\x04 \x01(\t\x12\x10\n\x08skip_run\x18\x05 \x01(\x08\"K\n\x10RestoreCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\x0f\n\x07\x65rrored\x18\x03 \x01(\x08\"B\n\x0bRelocateCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0b\n\x03src\x18\x02 \x01(\t\x12\x0b\n\x03\x64st\x18\x03 \x01(\t\x12\r\n\x05shard\x18\x04 \x01(\t\"<\n\x0fRelocateCmdTake\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\r\n\x05shard\x18\x03 \x01(\t\"T\n\x15RelocateCmdGiveStream\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x10\n\x08raw_data\x18\x03 \x01(\x0c\x12\r\n\x05shard\x18\x04 \x01(\t\":\n\x11RelocateCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"P\n\x15RelocateCmdTakeStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\x0f\n\x07\x65rrored\x18\x03 \x01(\x08\"(\n\x15RelocateCmdGiveStatus\x12\x0f\n\x07\x65rrored\x18\x01 \x01(\x08\"?\n\x05RmCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06target\x18\x02 \x01(\t\x12\x0b\n\x03\x61ll\x18\x03 \x01(\x08\x12\r\n\x05shard\x18\x04 \x01(\t\"4\n\x0bRmCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"%\n\x08\x43heckCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\r\n\x05shard\x18\x02 \x01(\t\"!\n\x0e\x43heckCmdStatus\x12\x0f\n\x07\x65rrored\x18\x01 \x01(\x08\x62\x06proto3')
+  serialized_pb=_b('\n\x0cshared.proto\x12\tlbackgrpc\"N\n\x0f\x42\x61\x63kupCmdStream\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\r\n\x05shard\x18\x03 \x01(\t\x12\x0e\n\x06\x66older\x18\x04 \x01(\t\";\n\tBackupCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0f\n\x07temp_id\x18\x02 \x01(\t\x12\x11\n\tagent_ids\x18\x03 \x03(\t\"8\n\x0f\x42\x61\x63kupCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"b\n\nRestoreCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x17\n\x0fuse_temp_folder\x18\x03 \x01(\x08\x12\r\n\x05shard\x18\x04 \x01(\t\x12\x10\n\x08skip_run\x18\x05 \x01(\x08\"K\n\x10RestoreCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\x0f\n\x07\x65rrored\x18\x03 \x01(\x08\"@\n\x10RestoreAcceptCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\x0e\n\x06\x66older\x18\x03 \x01(\t\"?\n\x16RestoreAcceptCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"B\n\x0bRelocateCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0b\n\x03src\x18\x02 \x01(\t\x12\x0b\n\x03\x64st\x18\x03 \x01(\t\x12\r\n\x05shard\x18\x04 \x01(\t\"<\n\x0fRelocateCmdTake\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\r\n\x05shard\x18\x03 \x01(\t\"T\n\x15RelocateCmdGiveStream\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x10\n\x08raw_data\x18\x03 \x01(\x0c\x12\r\n\x05shard\x18\x04 \x01(\t\":\n\x11RelocateCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"P\n\x15RelocateCmdTakeStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\x0f\n\x07\x65rrored\x18\x03 \x01(\x08\"(\n\x15RelocateCmdGiveStatus\x12\x0f\n\x07\x65rrored\x18\x01 \x01(\x08\"?\n\x05RmCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06target\x18\x02 \x01(\t\x12\x0b\n\x03\x61ll\x18\x03 \x01(\x08\x12\r\n\x05shard\x18\x04 \x01(\t\"4\n\x0bRmCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"%\n\x08\x43heckCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\r\n\x05shard\x18\x02 \x01(\t\"!\n\x0e\x43heckCmdStatus\x12\x0f\n\x07\x65rrored\x18\x01 \x01(\x08\x62\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -265,6 +265,89 @@ _RESTORECMDSTATUS = _descriptor.Descriptor(
 )
 
 
+_RESTOREACCEPTCMD = _descriptor.Descriptor(
+  name='RestoreAcceptCmd',
+  full_name='lbackgrpc.RestoreAcceptCmd',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='lbackgrpc.RestoreAcceptCmd.id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='raw_data', full_name='lbackgrpc.RestoreAcceptCmd.raw_data', index=1,
+      number=2, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b(""),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='folder', full_name='lbackgrpc.RestoreAcceptCmd.folder', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=403,
+  serialized_end=467,
+)
+
+
+_RESTOREACCEPTCMDSTATUS = _descriptor.Descriptor(
+  name='RestoreAcceptCmdStatus',
+  full_name='lbackgrpc.RestoreAcceptCmdStatus',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='elapsed_time', full_name='lbackgrpc.RestoreAcceptCmdStatus.elapsed_time', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='errored', full_name='lbackgrpc.RestoreAcceptCmdStatus.errored', index=1,
+      number=2, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=469,
+  serialized_end=532,
+)
+
+
 _RELOCATECMD = _descriptor.Descriptor(
   name='RelocateCmd',
   full_name='lbackgrpc.RelocateCmd',
@@ -312,8 +395,8 @@ _RELOCATECMD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=403,
-  serialized_end=469,
+  serialized_start=534,
+  serialized_end=600,
 )
 
 
@@ -357,8 +440,8 @@ _RELOCATECMDTAKE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=471,
-  serialized_end=531,
+  serialized_start=602,
+  serialized_end=662,
 )
 
 
@@ -409,8 +492,8 @@ _RELOCATECMDGIVESTREAM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=533,
-  serialized_end=617,
+  serialized_start=664,
+  serialized_end=748,
 )
 
 
@@ -447,8 +530,8 @@ _RELOCATECMDSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=619,
-  serialized_end=677,
+  serialized_start=750,
+  serialized_end=808,
 )
 
 
@@ -492,8 +575,8 @@ _RELOCATECMDTAKESTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=679,
-  serialized_end=759,
+  serialized_start=810,
+  serialized_end=890,
 )
 
 
@@ -523,8 +606,8 @@ _RELOCATECMDGIVESTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=761,
-  serialized_end=801,
+  serialized_start=892,
+  serialized_end=932,
 )
 
 
@@ -575,8 +658,8 @@ _RMCMD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=803,
-  serialized_end=866,
+  serialized_start=934,
+  serialized_end=997,
 )
 
 
@@ -613,8 +696,8 @@ _RMCMDSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=868,
-  serialized_end=920,
+  serialized_start=999,
+  serialized_end=1051,
 )
 
 
@@ -651,8 +734,8 @@ _CHECKCMD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=922,
-  serialized_end=959,
+  serialized_start=1053,
+  serialized_end=1090,
 )
 
 
@@ -682,8 +765,8 @@ _CHECKCMDSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=961,
-  serialized_end=994,
+  serialized_start=1092,
+  serialized_end=1125,
 )
 
 DESCRIPTOR.message_types_by_name['BackupCmdStream'] = _BACKUPCMDSTREAM
@@ -691,6 +774,8 @@ DESCRIPTOR.message_types_by_name['BackupCmd'] = _BACKUPCMD
 DESCRIPTOR.message_types_by_name['BackupCmdStatus'] = _BACKUPCMDSTATUS
 DESCRIPTOR.message_types_by_name['RestoreCmd'] = _RESTORECMD
 DESCRIPTOR.message_types_by_name['RestoreCmdStatus'] = _RESTORECMDSTATUS
+DESCRIPTOR.message_types_by_name['RestoreAcceptCmd'] = _RESTOREACCEPTCMD
+DESCRIPTOR.message_types_by_name['RestoreAcceptCmdStatus'] = _RESTOREACCEPTCMDSTATUS
 DESCRIPTOR.message_types_by_name['RelocateCmd'] = _RELOCATECMD
 DESCRIPTOR.message_types_by_name['RelocateCmdTake'] = _RELOCATECMDTAKE
 DESCRIPTOR.message_types_by_name['RelocateCmdGiveStream'] = _RELOCATECMDGIVESTREAM
@@ -736,6 +821,20 @@ RestoreCmdStatus = _reflection.GeneratedProtocolMessageType('RestoreCmdStatus', 
   # @@protoc_insertion_point(class_scope:lbackgrpc.RestoreCmdStatus)
   ))
 _sym_db.RegisterMessage(RestoreCmdStatus)
+
+RestoreAcceptCmd = _reflection.GeneratedProtocolMessageType('RestoreAcceptCmd', (_message.Message,), dict(
+  DESCRIPTOR = _RESTOREACCEPTCMD,
+  __module__ = 'shared_pb2'
+  # @@protoc_insertion_point(class_scope:lbackgrpc.RestoreAcceptCmd)
+  ))
+_sym_db.RegisterMessage(RestoreAcceptCmd)
+
+RestoreAcceptCmdStatus = _reflection.GeneratedProtocolMessageType('RestoreAcceptCmdStatus', (_message.Message,), dict(
+  DESCRIPTOR = _RESTOREACCEPTCMDSTATUS,
+  __module__ = 'shared_pb2'
+  # @@protoc_insertion_point(class_scope:lbackgrpc.RestoreAcceptCmdStatus)
+  ))
+_sym_db.RegisterMessage(RestoreAcceptCmdStatus)
 
 RelocateCmd = _reflection.GeneratedProtocolMessageType('RelocateCmd', (_message.Message,), dict(
   DESCRIPTOR = _RELOCATECMD,

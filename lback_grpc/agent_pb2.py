@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='agent.proto',
   package='lbackgrpc',
   syntax='proto3',
-  serialized_pb=_b('\n\x0b\x61gent.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\x8e\x04\n\x05\x41gent\x12\x46\n\x08\x44oBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12M\n\x0f\x44oShardedBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12R\n\x0e\x44oRelocateTake\x12\x1a.lbackgrpc.RelocateCmdTake\x1a .lbackgrpc.RelocateCmdTakeStatus\"\x00\x30\x01\x12X\n\x0e\x44oRelocateGive\x12 .lbackgrpc.RelocateCmdGiveStream\x1a .lbackgrpc.RelocateCmdGiveStatus\"\x00(\x01\x12\x43\n\tDoRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x30\x01\x12\x32\n\x04\x44oRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x12G\n\x13\x44oCheckBackupExists\x12\x13.lbackgrpc.CheckCmd\x1a\x19.lbackgrpc.CheckCmdStatus\"\x00\x42\x1d\n\x12io.grpc.lback.grpcB\x05\x41gentP\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0b\x61gent.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\xe1\x04\n\x05\x41gent\x12\x46\n\x08\x44oBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12M\n\x0f\x44oShardedBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12R\n\x0e\x44oRelocateTake\x12\x1a.lbackgrpc.RelocateCmdTake\x1a .lbackgrpc.RelocateCmdTakeStatus\"\x00\x30\x01\x12X\n\x0e\x44oRelocateGive\x12 .lbackgrpc.RelocateCmdGiveStream\x1a .lbackgrpc.RelocateCmdGiveStatus\"\x00(\x01\x12\x43\n\tDoRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x30\x01\x12Q\n\x0f\x44oRestoreAccept\x12\x1b.lbackgrpc.RestoreAcceptCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00(\x01\x30\x01\x12\x32\n\x04\x44oRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x12G\n\x13\x44oCheckBackupExists\x12\x13.lbackgrpc.CheckCmd\x1a\x19.lbackgrpc.CheckCmdStatus\"\x00\x42\x1d\n\x12io.grpc.lback.grpcB\x05\x41gentP\x01\x62\x06proto3')
   ,
   dependencies=[shared__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -76,6 +76,11 @@ try:
           request_serializer=shared__pb2.RestoreCmd.SerializeToString,
           response_deserializer=shared__pb2.RestoreCmdStatus.FromString,
           )
+      self.DoRestoreAccept = channel.stream_stream(
+          '/lbackgrpc.Agent/DoRestoreAccept',
+          request_serializer=shared__pb2.RestoreAcceptCmd.SerializeToString,
+          response_deserializer=shared__pb2.RestoreCmdStatus.FromString,
+          )
       self.DoRm = channel.unary_unary(
           '/lbackgrpc.Agent/DoRm',
           request_serializer=shared__pb2.RmCmd.SerializeToString,
@@ -113,6 +118,11 @@ try:
       raise NotImplementedError('Method not implemented!')
 
     def DoRestore(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def DoRestoreAccept(self, request_iterator, context):
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
@@ -155,6 +165,11 @@ try:
             request_deserializer=shared__pb2.RestoreCmd.FromString,
             response_serializer=shared__pb2.RestoreCmdStatus.SerializeToString,
         ),
+        'DoRestoreAccept': grpc.stream_stream_rpc_method_handler(
+            servicer.DoRestoreAccept,
+            request_deserializer=shared__pb2.RestoreAcceptCmd.FromString,
+            response_serializer=shared__pb2.RestoreCmdStatus.SerializeToString,
+        ),
         'DoRm': grpc.unary_unary_rpc_method_handler(
             servicer.DoRm,
             request_deserializer=shared__pb2.RmCmd.FromString,
@@ -189,6 +204,8 @@ try:
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def DoRestore(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def DoRestoreAccept(self, request_iterator, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def DoRm(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def DoCheckBackupExists(self, request, context):
@@ -216,6 +233,8 @@ try:
     DoRelocateGive.future = None
     def DoRestore(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
+    def DoRestoreAccept(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
     def DoRm(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     DoRm.future = None
@@ -236,6 +255,7 @@ try:
       ('lbackgrpc.Agent', 'DoRelocateGive'): shared__pb2.RelocateCmdGiveStream.FromString,
       ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTake.FromString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmd.FromString,
+      ('lbackgrpc.Agent', 'DoRestoreAccept'): shared__pb2.RestoreAcceptCmd.FromString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmd.FromString,
       ('lbackgrpc.Agent', 'DoShardedBackup'): shared__pb2.BackupCmdStream.FromString,
     }
@@ -245,6 +265,7 @@ try:
       ('lbackgrpc.Agent', 'DoRelocateGive'): shared__pb2.RelocateCmdGiveStatus.SerializeToString,
       ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTakeStatus.SerializeToString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmdStatus.SerializeToString,
+      ('lbackgrpc.Agent', 'DoRestoreAccept'): shared__pb2.RestoreCmdStatus.SerializeToString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmdStatus.SerializeToString,
       ('lbackgrpc.Agent', 'DoShardedBackup'): shared__pb2.BackupCmdStatus.SerializeToString,
     }
@@ -254,6 +275,7 @@ try:
       ('lbackgrpc.Agent', 'DoRelocateGive'): face_utilities.stream_unary_inline(servicer.DoRelocateGive),
       ('lbackgrpc.Agent', 'DoRelocateTake'): face_utilities.unary_stream_inline(servicer.DoRelocateTake),
       ('lbackgrpc.Agent', 'DoRestore'): face_utilities.unary_stream_inline(servicer.DoRestore),
+      ('lbackgrpc.Agent', 'DoRestoreAccept'): face_utilities.stream_stream_inline(servicer.DoRestoreAccept),
       ('lbackgrpc.Agent', 'DoRm'): face_utilities.unary_unary_inline(servicer.DoRm),
       ('lbackgrpc.Agent', 'DoShardedBackup'): face_utilities.stream_unary_inline(servicer.DoShardedBackup),
     }
@@ -273,6 +295,7 @@ try:
       ('lbackgrpc.Agent', 'DoRelocateGive'): shared__pb2.RelocateCmdGiveStream.SerializeToString,
       ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTake.SerializeToString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmd.SerializeToString,
+      ('lbackgrpc.Agent', 'DoRestoreAccept'): shared__pb2.RestoreAcceptCmd.SerializeToString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmd.SerializeToString,
       ('lbackgrpc.Agent', 'DoShardedBackup'): shared__pb2.BackupCmdStream.SerializeToString,
     }
@@ -282,6 +305,7 @@ try:
       ('lbackgrpc.Agent', 'DoRelocateGive'): shared__pb2.RelocateCmdGiveStatus.FromString,
       ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTakeStatus.FromString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmdStatus.FromString,
+      ('lbackgrpc.Agent', 'DoRestoreAccept'): shared__pb2.RestoreCmdStatus.FromString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmdStatus.FromString,
       ('lbackgrpc.Agent', 'DoShardedBackup'): shared__pb2.BackupCmdStatus.FromString,
     }
@@ -291,6 +315,7 @@ try:
       'DoRelocateGive': cardinality.Cardinality.STREAM_UNARY,
       'DoRelocateTake': cardinality.Cardinality.UNARY_STREAM,
       'DoRestore': cardinality.Cardinality.UNARY_STREAM,
+      'DoRestoreAccept': cardinality.Cardinality.STREAM_STREAM,
       'DoRm': cardinality.Cardinality.UNARY_UNARY,
       'DoShardedBackup': cardinality.Cardinality.STREAM_UNARY,
     }

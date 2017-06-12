@@ -41,6 +41,11 @@ class AgentStub(object):
         request_serializer=shared__pb2.RestoreCmd.SerializeToString,
         response_deserializer=shared__pb2.RestoreCmdStatus.FromString,
         )
+    self.DoRestoreAccept = channel.stream_stream(
+        '/lbackgrpc.Agent/DoRestoreAccept',
+        request_serializer=shared__pb2.RestoreAcceptCmd.SerializeToString,
+        response_deserializer=shared__pb2.RestoreCmdStatus.FromString,
+        )
     self.DoRm = channel.unary_unary(
         '/lbackgrpc.Agent/DoRm',
         request_serializer=shared__pb2.RmCmd.SerializeToString,
@@ -82,6 +87,11 @@ class AgentServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def DoRestoreAccept(self, request_iterator, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
   def DoRm(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -118,6 +128,11 @@ def add_AgentServicer_to_server(servicer, server):
       'DoRestore': grpc.unary_stream_rpc_method_handler(
           servicer.DoRestore,
           request_deserializer=shared__pb2.RestoreCmd.FromString,
+          response_serializer=shared__pb2.RestoreCmdStatus.SerializeToString,
+      ),
+      'DoRestoreAccept': grpc.stream_stream_rpc_method_handler(
+          servicer.DoRestoreAccept,
+          request_deserializer=shared__pb2.RestoreAcceptCmd.FromString,
           response_serializer=shared__pb2.RestoreCmdStatus.SerializeToString,
       ),
       'DoRm': grpc.unary_unary_rpc_method_handler(

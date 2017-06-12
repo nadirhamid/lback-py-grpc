@@ -281,12 +281,12 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
          def agent_restore_accept_fn(agent):
             return agent.DoRestoreAccept(iterator)
 
-        if request.target:
+         if request.target:
             target_agent = self.FetchAgentById(target)
             result = self.RouteOnAgent(target_agent, agent_restore_accept_fn)
             return shared_pb2.RestoreCmdStatus(errored=result.errored)
-        restore.run_chunked(iterator)
-        return shared_pb2.RestoreCmdStatus(
+         restore.run_chunked(iterator)
+         return shared_pb2.RestoreCmdStatus(
             errored=False)
         
      def do_shared_restore():
