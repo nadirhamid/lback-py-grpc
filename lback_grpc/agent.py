@@ -82,9 +82,12 @@ class Agent(agent_pb2_grpc.AgentServicer):
     lback_output("Received COMMAND DoRestoreAccept")
     request_iterator, iter_copy= tee( request_iterator )
     request = next(iter_copy)
+    def chunked_iterator():
+        for chunk in request_iterator:
+            yield chunk.raw_data
     try:
        restore =Restore( request.id, folder=request.folder )
-       restore.run_chunked(request_iterator)
+       restore.run_chunked(chunked_iterator())
     except Exception,ex:
        print_exc(ex)
        return shared_pb2.RestoreAcceptCmdStatus(
