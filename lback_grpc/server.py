@@ -272,6 +272,7 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
      db_backup = lback_backup( request.id )
      folder = request.folder
      target = request.target
+     lback_output("TARGET %s"%(target))
      restore_kwargs = dict( 
          folder = ( request.folder if request.use_temp_folder else db_backup.folder ),
          run = not request.skip_run ) 
@@ -279,7 +280,7 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
 
      def do_restore(iterator):
          def agent_restore_accept_fn(agent):
-            return agent.DoRestoreAccept(iterator)
+            return agent[1].DoRestoreAccept(iterator)
 
          if request.target:
             target_agent = self.FetchAgentById(target)

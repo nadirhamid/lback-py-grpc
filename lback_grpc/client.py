@@ -32,7 +32,9 @@ class Client( object ):
                 lback_output("BACKUP could not be propagated")
     def _run_restore( self, operation_instance, backup ):
         lback_output("Routing RESTORE")
-        cmd = shared_pb2.RestoreCmd( id=backup.id )
+        cmd = shared_pb2.RestoreCmd( 
+            id=backup.id, 
+            target=operation_instance.args.target )
         if operation_instance.args.folder:
             cmd = shared_pb2.RestoreCmd( 
                 id=backup.id, 

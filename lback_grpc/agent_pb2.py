@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='agent.proto',
   package='lbackgrpc',
   syntax='proto3',
-  serialized_pb=_b('\n\x0b\x61gent.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\xe1\x04\n\x05\x41gent\x12\x46\n\x08\x44oBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12M\n\x0f\x44oShardedBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12R\n\x0e\x44oRelocateTake\x12\x1a.lbackgrpc.RelocateCmdTake\x1a .lbackgrpc.RelocateCmdTakeStatus\"\x00\x30\x01\x12X\n\x0e\x44oRelocateGive\x12 .lbackgrpc.RelocateCmdGiveStream\x1a .lbackgrpc.RelocateCmdGiveStatus\"\x00(\x01\x12\x43\n\tDoRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x30\x01\x12Q\n\x0f\x44oRestoreAccept\x12\x1b.lbackgrpc.RestoreAcceptCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00(\x01\x30\x01\x12\x32\n\x04\x44oRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x12G\n\x13\x44oCheckBackupExists\x12\x13.lbackgrpc.CheckCmd\x1a\x19.lbackgrpc.CheckCmdStatus\"\x00\x42\x1d\n\x12io.grpc.lback.grpcB\x05\x41gentP\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0b\x61gent.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\xdf\x04\n\x05\x41gent\x12\x46\n\x08\x44oBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12M\n\x0f\x44oShardedBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12R\n\x0e\x44oRelocateTake\x12\x1a.lbackgrpc.RelocateCmdTake\x1a .lbackgrpc.RelocateCmdTakeStatus\"\x00\x30\x01\x12X\n\x0e\x44oRelocateGive\x12 .lbackgrpc.RelocateCmdGiveStream\x1a .lbackgrpc.RelocateCmdGiveStatus\"\x00(\x01\x12\x43\n\tDoRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x30\x01\x12O\n\x0f\x44oRestoreAccept\x12\x1b.lbackgrpc.RestoreAcceptCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00(\x01\x12\x32\n\x04\x44oRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x12G\n\x13\x44oCheckBackupExists\x12\x13.lbackgrpc.CheckCmd\x1a\x19.lbackgrpc.CheckCmdStatus\"\x00\x42\x1d\n\x12io.grpc.lback.grpcB\x05\x41gentP\x01\x62\x06proto3')
   ,
   dependencies=[shared__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -76,7 +76,7 @@ try:
           request_serializer=shared__pb2.RestoreCmd.SerializeToString,
           response_deserializer=shared__pb2.RestoreCmdStatus.FromString,
           )
-      self.DoRestoreAccept = channel.stream_stream(
+      self.DoRestoreAccept = channel.stream_unary(
           '/lbackgrpc.Agent/DoRestoreAccept',
           request_serializer=shared__pb2.RestoreAcceptCmd.SerializeToString,
           response_deserializer=shared__pb2.RestoreCmdStatus.FromString,
@@ -165,7 +165,7 @@ try:
             request_deserializer=shared__pb2.RestoreCmd.FromString,
             response_serializer=shared__pb2.RestoreCmdStatus.SerializeToString,
         ),
-        'DoRestoreAccept': grpc.stream_stream_rpc_method_handler(
+        'DoRestoreAccept': grpc.stream_unary_rpc_method_handler(
             servicer.DoRestoreAccept,
             request_deserializer=shared__pb2.RestoreAcceptCmd.FromString,
             response_serializer=shared__pb2.RestoreCmdStatus.SerializeToString,
@@ -235,6 +235,7 @@ try:
       raise NotImplementedError()
     def DoRestoreAccept(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
+    DoRestoreAccept.future = None
     def DoRm(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     DoRm.future = None
@@ -275,7 +276,7 @@ try:
       ('lbackgrpc.Agent', 'DoRelocateGive'): face_utilities.stream_unary_inline(servicer.DoRelocateGive),
       ('lbackgrpc.Agent', 'DoRelocateTake'): face_utilities.unary_stream_inline(servicer.DoRelocateTake),
       ('lbackgrpc.Agent', 'DoRestore'): face_utilities.unary_stream_inline(servicer.DoRestore),
-      ('lbackgrpc.Agent', 'DoRestoreAccept'): face_utilities.stream_stream_inline(servicer.DoRestoreAccept),
+      ('lbackgrpc.Agent', 'DoRestoreAccept'): face_utilities.stream_unary_inline(servicer.DoRestoreAccept),
       ('lbackgrpc.Agent', 'DoRm'): face_utilities.unary_unary_inline(servicer.DoRm),
       ('lbackgrpc.Agent', 'DoShardedBackup'): face_utilities.stream_unary_inline(servicer.DoShardedBackup),
     }
@@ -315,7 +316,7 @@ try:
       'DoRelocateGive': cardinality.Cardinality.STREAM_UNARY,
       'DoRelocateTake': cardinality.Cardinality.UNARY_STREAM,
       'DoRestore': cardinality.Cardinality.UNARY_STREAM,
-      'DoRestoreAccept': cardinality.Cardinality.STREAM_STREAM,
+      'DoRestoreAccept': cardinality.Cardinality.STREAM_UNARY,
       'DoRm': cardinality.Cardinality.UNARY_UNARY,
       'DoShardedBackup': cardinality.Cardinality.STREAM_UNARY,
     }
