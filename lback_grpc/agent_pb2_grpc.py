@@ -44,7 +44,7 @@ class AgentStub(object):
     self.DoRestoreAccept = channel.stream_unary(
         '/lbackgrpc.Agent/DoRestoreAccept',
         request_serializer=shared__pb2.RestoreAcceptCmd.SerializeToString,
-        response_deserializer=shared__pb2.RestoreCmdStatus.FromString,
+        response_deserializer=shared__pb2.RestoreAcceptCmdStatus.FromString,
         )
     self.DoRm = channel.unary_unary(
         '/lbackgrpc.Agent/DoRm',
@@ -133,7 +133,7 @@ def add_AgentServicer_to_server(servicer, server):
       'DoRestoreAccept': grpc.stream_unary_rpc_method_handler(
           servicer.DoRestoreAccept,
           request_deserializer=shared__pb2.RestoreAcceptCmd.FromString,
-          response_serializer=shared__pb2.RestoreCmdStatus.SerializeToString,
+          response_serializer=shared__pb2.RestoreAcceptCmdStatus.SerializeToString,
       ),
       'DoRm': grpc.unary_unary_rpc_method_handler(
           servicer.DoRm,

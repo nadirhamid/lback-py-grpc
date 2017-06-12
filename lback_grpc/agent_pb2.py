@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='agent.proto',
   package='lbackgrpc',
   syntax='proto3',
-  serialized_pb=_b('\n\x0b\x61gent.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\xdf\x04\n\x05\x41gent\x12\x46\n\x08\x44oBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12M\n\x0f\x44oShardedBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12R\n\x0e\x44oRelocateTake\x12\x1a.lbackgrpc.RelocateCmdTake\x1a .lbackgrpc.RelocateCmdTakeStatus\"\x00\x30\x01\x12X\n\x0e\x44oRelocateGive\x12 .lbackgrpc.RelocateCmdGiveStream\x1a .lbackgrpc.RelocateCmdGiveStatus\"\x00(\x01\x12\x43\n\tDoRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x30\x01\x12O\n\x0f\x44oRestoreAccept\x12\x1b.lbackgrpc.RestoreAcceptCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00(\x01\x12\x32\n\x04\x44oRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x12G\n\x13\x44oCheckBackupExists\x12\x13.lbackgrpc.CheckCmd\x1a\x19.lbackgrpc.CheckCmdStatus\"\x00\x42\x1d\n\x12io.grpc.lback.grpcB\x05\x41gentP\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0b\x61gent.proto\x12\tlbackgrpc\x1a\x0cshared.proto2\xe5\x04\n\x05\x41gent\x12\x46\n\x08\x44oBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12M\n\x0f\x44oShardedBackup\x12\x1a.lbackgrpc.BackupCmdStream\x1a\x1a.lbackgrpc.BackupCmdStatus\"\x00(\x01\x12R\n\x0e\x44oRelocateTake\x12\x1a.lbackgrpc.RelocateCmdTake\x1a .lbackgrpc.RelocateCmdTakeStatus\"\x00\x30\x01\x12X\n\x0e\x44oRelocateGive\x12 .lbackgrpc.RelocateCmdGiveStream\x1a .lbackgrpc.RelocateCmdGiveStatus\"\x00(\x01\x12\x43\n\tDoRestore\x12\x15.lbackgrpc.RestoreCmd\x1a\x1b.lbackgrpc.RestoreCmdStatus\"\x00\x30\x01\x12U\n\x0f\x44oRestoreAccept\x12\x1b.lbackgrpc.RestoreAcceptCmd\x1a!.lbackgrpc.RestoreAcceptCmdStatus\"\x00(\x01\x12\x32\n\x04\x44oRm\x12\x10.lbackgrpc.RmCmd\x1a\x16.lbackgrpc.RmCmdStatus\"\x00\x12G\n\x13\x44oCheckBackupExists\x12\x13.lbackgrpc.CheckCmd\x1a\x19.lbackgrpc.CheckCmdStatus\"\x00\x42\x1d\n\x12io.grpc.lback.grpcB\x05\x41gentP\x01\x62\x06proto3')
   ,
   dependencies=[shared__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -79,7 +79,7 @@ try:
       self.DoRestoreAccept = channel.stream_unary(
           '/lbackgrpc.Agent/DoRestoreAccept',
           request_serializer=shared__pb2.RestoreAcceptCmd.SerializeToString,
-          response_deserializer=shared__pb2.RestoreCmdStatus.FromString,
+          response_deserializer=shared__pb2.RestoreAcceptCmdStatus.FromString,
           )
       self.DoRm = channel.unary_unary(
           '/lbackgrpc.Agent/DoRm',
@@ -168,7 +168,7 @@ try:
         'DoRestoreAccept': grpc.stream_unary_rpc_method_handler(
             servicer.DoRestoreAccept,
             request_deserializer=shared__pb2.RestoreAcceptCmd.FromString,
-            response_serializer=shared__pb2.RestoreCmdStatus.SerializeToString,
+            response_serializer=shared__pb2.RestoreAcceptCmdStatus.SerializeToString,
         ),
         'DoRm': grpc.unary_unary_rpc_method_handler(
             servicer.DoRm,
@@ -266,7 +266,7 @@ try:
       ('lbackgrpc.Agent', 'DoRelocateGive'): shared__pb2.RelocateCmdGiveStatus.SerializeToString,
       ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTakeStatus.SerializeToString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmdStatus.SerializeToString,
-      ('lbackgrpc.Agent', 'DoRestoreAccept'): shared__pb2.RestoreCmdStatus.SerializeToString,
+      ('lbackgrpc.Agent', 'DoRestoreAccept'): shared__pb2.RestoreAcceptCmdStatus.SerializeToString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmdStatus.SerializeToString,
       ('lbackgrpc.Agent', 'DoShardedBackup'): shared__pb2.BackupCmdStatus.SerializeToString,
     }
@@ -306,7 +306,7 @@ try:
       ('lbackgrpc.Agent', 'DoRelocateGive'): shared__pb2.RelocateCmdGiveStatus.FromString,
       ('lbackgrpc.Agent', 'DoRelocateTake'): shared__pb2.RelocateCmdTakeStatus.FromString,
       ('lbackgrpc.Agent', 'DoRestore'): shared__pb2.RestoreCmdStatus.FromString,
-      ('lbackgrpc.Agent', 'DoRestoreAccept'): shared__pb2.RestoreCmdStatus.FromString,
+      ('lbackgrpc.Agent', 'DoRestoreAccept'): shared__pb2.RestoreAcceptCmdStatus.FromString,
       ('lbackgrpc.Agent', 'DoRm'): shared__pb2.RmCmdStatus.FromString,
       ('lbackgrpc.Agent', 'DoShardedBackup'): shared__pb2.BackupCmdStatus.FromString,
     }

@@ -84,10 +84,12 @@ class Agent(agent_pb2_grpc.AgentServicer):
     request = next(iter_copy)
     def chunked_iterator():
         for chunk in request_iterator:
+            lback_output("STORING RESTORE CHUNK")
             yield chunk.raw_data
     try:
        restore =Restore( request.id, folder=request.folder )
        restore.run_chunked(chunked_iterator())
+       lback_output("RESTORE SUCCESSFULL")
     except Exception,ex:
        print_exc(ex)
        return shared_pb2.RestoreAcceptCmdStatus(
