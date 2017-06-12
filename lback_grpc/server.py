@@ -248,7 +248,7 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
          else:
              for relocate_take_chunk in  iterator:
                  yield shared_pb2.RelocateCmdGiveStream(
-                        id=relocate_take_chunk.id,
+                        id=backup.id,
                         raw_data=relocate_take_chunk.raw_data,
                         folder=backup.folder )
      iterator = self.RouteOnAgent( dst_agent, agent_give_fn )

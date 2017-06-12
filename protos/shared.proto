@@ -78,7 +78,8 @@ message RelocateCmdTake {
 message RelocateCmdGiveStream {
   // The location from which the message is sent.
   string id = 1;
-  bytes raw_data = 2;
+  string folder = 2;
+  bytes raw_data = 3;
 }
 message RelocateCmdStatus {
   int32 elapsed_time = 1;
