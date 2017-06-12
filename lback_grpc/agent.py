@@ -1,5 +1,5 @@
 from lback.backup import Backup
-from lback.utils import lback_backup, lback_backup_chunked_file, lback_backup_remove, lback_output, lback_backup_path, lback_id
+from lback.utils import lback_backup, lback_backup_chunked_file, lback_backup_remove, lback_output, lback_backup_path, lback_id, lback_temp_file
 from lback.restore import Restore
 from . import agent_pb2
 from . import agent_pb2_grpc
@@ -8,6 +8,7 @@ from . import shared_pb2_grpc
 from . import protobuf_empty_to_none
 from itertools import tee
 from traceback import print_exc
+import shutil
 import os
 
 class Agent(agent_pb2_grpc.AgentServicer):
@@ -36,11 +37,12 @@ class Agent(agent_pb2_grpc.AgentServicer):
     full_id = lback_id(request.id, shard=protobuf_empty_to_none(request.shard))
 
     try:
-        iterator = lback_backup_chunked_file( full_id )
+        temp_file = lback_temp_file()
+        shutil.move( lback_backup_path( full_id ), temp_file.name )
+        iterator = lback_backup_chunked_file( full_id, use_backup_path=False )
         for file_chunk_res in iterator:
             lback_output("PACKING RELOCATE BACKUP CHUNK")
             yield shared_pb2.RelocateCmdTakeStatus( raw_data=file_chunk_res, errored=False)
-        os.remove( lback_backup_path( full_id ) )
     except Exception,ex:
         yield shared_pb2.RelocateCmdGiveStatus( errored=True )
   def DoRelocateGive(self, request_iterator, context):
