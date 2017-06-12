@@ -42,11 +42,11 @@ class Client( object ):
         else:
             lback_output("RESTORE could not be performed")
         return reply
-    def _run_relocate( self, operation_instance ):
+    def _run_relocate( self, operation_instance, backup ):
         lback_output("Routing RELOCATE")
         reply = self.server.RouteRelocate( 
         shared_pb2.RelocateCmd( 
-                id=id,
+                id=backup.id,
                 src=operation_instance.args.src,
                 dst=operation_instance.args.dst ) )
         if not reply.errored:

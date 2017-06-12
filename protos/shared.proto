@@ -82,11 +82,13 @@ message RelocateCmdGiveStream {
 }
 message RelocateCmdStatus {
   int32 elapsed_time = 1;
+  bool errored = 2;
 }
 
 message RelocateCmdTakeStatus {
   int32 elapsed_time = 1;
-  bool errored  = 2;
+  bytes raw_data = 2;
+  bool errored  = 3;
 }
 
 message RelocateCmdGiveStatus {
