@@ -54,7 +54,7 @@ def serve( addr ):
   try:
     while True:
        check_for_agent_updates()
-       schedule_backups()
+       ##schedule_backups()
        time.sleep( 5.0 )
       
   except KeyboardInterrupt:
