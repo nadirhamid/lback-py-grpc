@@ -51,11 +51,12 @@ class Agent(agent_pb2_grpc.AgentServicer):
             yield relocate_cmd_chunk.raw_data
     try:
         iterator = backup.run_chunked( relocate_chunked_iterator )
-        for relocate_chunk_res in iterator:
-            yield shared_pb2.RelocateCmdStatus(errored=False)
+        for _ in iterator:
+            pass
     except Exception,ex:
         print_exc(ex)
-        yield shared_pb2.RelocateCmdStatus(errored=True )
+        return shared_pb2.RelocateCmdStatus(errored=True )
+    return shared_pb2.RelocateCmdStatus(errored=False)
 
   def DoRestore(self, request, context):
     lback_output("Received COMMAND DoRestore")
