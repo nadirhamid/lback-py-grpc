@@ -5,6 +5,7 @@ from . import server_pb2
 from . import server_pb2_grpc
 from . import shared_pb2
 from . import shared_pb2_grpc
+from . import protobuf_empty_to_none
 from .server_scheduler import ServerScheduler
 from .sharded_iterator import ShardedIterator
 from .agent_server_object import AgentServerObject
@@ -225,12 +226,14 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
      src_agent = self.FindAgent( request.src )
      dst_agent = self.FindAgent( request.dst )
      backup = lback_backup( request.id )
+     shard = request.shard
      iterator = None
      def agent_take_fn(agent):
          lback_output("Running Relocate TAKE")
          return agent[1].DoRelocateTake( 
                 shared_pb2.RelocateCmdTake(
                     folder=backup.folder,
+                    shard=shard,
                     id=request.id))
      def agent_give_fn(agent):
          lback_output("Running Relocate GIVE")
@@ -245,6 +248,7 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
                  yield shared_pb2.RelocateCmdGiveStream(
                         id=backup.id,
                         raw_data=relocate_take_chunk.raw_data,
+                        shard=shard,
                         folder=backup.folder )
      result = self.RouteOnAgent( dst_agent, agent_give_fn )
      lback_output("COMPLETED RELOCATE")

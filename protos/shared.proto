@@ -68,11 +68,13 @@ message RelocateCmd {
   string id = 1;
   string src = 2;
   string dst = 3;
+  string shard = 4;
 }
 
 message RelocateCmdTake {
   string id = 1;
   string folder = 2;
+  string shard = 3;
 }
 
 message RelocateCmdGiveStream {
@@ -80,6 +82,7 @@ message RelocateCmdGiveStream {
   string id = 1;
   string folder = 2;
   bytes raw_data = 3;
+  string shard = 4;
 }
 message RelocateCmdStatus {
   int32 elapsed_time = 1;

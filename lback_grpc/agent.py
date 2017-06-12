@@ -33,18 +33,22 @@ class Agent(agent_pb2_grpc.AgentServicer):
 
   def DoRelocateTake(self, request, context):
     lback_output("Received COMMAND DoRelocateTake")
+    full_id = lback_id(request.id, shard=protobuf_empty_to_none(request.shard))
+
     try:
-        iterator = lback_backup_chunked_file( request.id )
+        iterator = lback_backup_chunked_file( full_id )
         for file_chunk_res in iterator:
             lback_output("PACKING RELOCATE BACKUP CHUNK")
             yield shared_pb2.RelocateCmdTakeStatus( raw_data=file_chunk_res, errored=False)
+        os.remove( lback_backup_path( full_id ) )
     except Exception,ex:
         yield shared_pb2.RelocateCmdGiveStatus( errored=True )
   def DoRelocateGive(self, request_iterator, context):
     lback_output("Received COMMAND DoRelocateGive")
     request_iterator, iter_copy = tee( request_iterator )
     request = next(iter_copy)
-    backup = Backup( request.id, request.folder )
+    full_id = lback_id(request.id, shard=protobuf_empty_to_none(request.shard))
+    backup = Backup( full_id, request.folder )
     def relocate_cmd_chunked_iterator():
         for relocate_cmd_chunk in request_iterator:
             lback_output("SAVING RELOCATE BACKUP GIVE CHUNK")
