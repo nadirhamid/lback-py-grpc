@@ -50,7 +50,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
             lback_output("SAVING RELOCATE BACKUP GIVE CHUNK")
             yield relocate_cmd_chunk.raw_data
     try:
-        iterator = backup.run_chunked( relocate_chunked_iterator )
+        iterator = backup.write_chunked( relocate_chunked_iterator() )
         for _ in iterator:
             pass
     except Exception,ex:

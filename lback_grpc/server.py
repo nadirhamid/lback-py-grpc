@@ -227,36 +227,29 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
      backup = lback_backup( request.id )
      iterator = None
      def agent_take_fn(agent):
+         lback_output("Running Relocate TAKE")
          return agent[1].DoRelocateTake( 
                 shared_pb2.RelocateCmdTake(
                     folder=backup.folder,
                     id=request.id))
      def agent_give_fn(agent):
+         lback_output("Running Relocate GIVE")
          return agent[1].DoRelocateGive(chunked_iterator())
-     def give_loop_and_return(iterator):
-         for cmd_status in iterator:
-            if cmd_status.errored:
-                return shared_pb2.RelocateCmdStatus(
-                    errored=True)
-         return shared_pb2.RelocateCmdStatus(
-            errored=False)
-
      def chunked_iterator():
          iterator = self.RouteOnAgent( src_agent, agent_take_fn )
          if not iterator:
              yield None
          else:
              for relocate_take_chunk in  iterator:
+                 lback_output("Packing Relocate CHUNK")
                  yield shared_pb2.RelocateCmdGiveStream(
                         id=backup.id,
                         raw_data=relocate_take_chunk.raw_data,
                         folder=backup.folder )
-     iterator = self.RouteOnAgent( dst_agent, agent_give_fn )
-     if not iterator:
-         return shared_pb2.RelocateCmdStatus(errored=True)
-     result = give_loop_and_return(iterator)
+     result = self.RouteOnAgent( dst_agent, agent_give_fn )
      lback_output("COMPLETED RELOCATE")
-     return result
+     return shared_pb2.RelocateCmdStatus(
+        errored=result.errored)
  
   @WithLock    
   def RouteRestore(self, request, context):
