@@ -1,5 +1,5 @@
 from lback.backup import Backup
-from lback.utils import lback_backup, lback_backup_chunked_file, lback_backup_remove, lback_output, lback_backup_path, lback_id, lback_temp_file
+from lback.utils import lback_backup, lback_backup_chunked_file, lback_backup_remove, lback_output, lback_backup_path, lback_id, lback_temp_file, lback_backup_shard_size, lback_backup_shard_start_end
 from lback.restore import Restore
 from . import agent_pb2
 from . import agent_pb2_grpc
@@ -32,18 +32,58 @@ class Agent(agent_pb2_grpc.AgentServicer):
     lback_output("BACKUP COMPLETE")
     return shared_pb2.BackupCmdStatus( errored=False )
 
-  def DoBackupAccept(self, request, context):
-    lback_output("Received COMMAND DoBackupAccept")
+  def DoBackupAcceptFull(self, request, context):
+    lback_output("Received COMMAND DoBackupAcceptFull")
+    folder = args.folder
+    bkp = Backup(id, folder, diff=args.diff, encryption_key=args.encryption_key)
 
+    try:
+        lback_output("RUNNING FULL BACKUP")
+        bkp.run()
+        if args.remove:
+          shutil.rmtree(folder)
+          lback_output("Directory successfully deleted..")
+    except Exception,ex:
+        return shared_pb2.BackupAcceptStatus(
+            errored=True)
+
+  def DoBackupAcceptDiff(self, request_iterator, context):
+    lback_output("Received COMMAND DoBackupAcceptDiff")
+    request_iterator, iter_copy = tee( request_iterator )
+    request = next(iter_copy)
+    folder = args.folder
+    bkp = Backup(id, folder, diff=args.diff, encryption_key=args.encryption_key)
+    restore_path = lback_temp_path()
+    def chunked_restore_iterator():
+        for res in request_iterator:
+            yield res.raw_data
+    try:
+        restore = Restore(id, request.folder)
+        restore.run_chunked(chunked_restore_iterator()) 
+        bkp.run_diff(restore_path)  
+    except Exception,ex:
+        return shared_pb2.BackupAcceptStatus(
+            errored=True)
+    return shared_pb2.BackupAcceptStatus(
+            errored=False)
+     
   def DoRelocateTake(self, request, context):
     lback_output("Received COMMAND DoRelocateTake")
     lback_output("ID %s, SHARD %s"%( request.id, request.shard, ) )
-    full_id = lback_id(request.id, shard=protobuf_empty_to_none(request.shard))
-
+    shard = protobuf_empty_to_none(request.shard)
+    full_id = lback_id(request.id, shard=shard)
+    backup_full_path = lback_backup_path( full_id )
     try:
-        temp_file = lback_temp_file()
-        shutil.move( lback_backup_path( full_id ), temp_file.name )
-        iterator = lback_backup_chunked_file( temp_file.name, use_backup_path=False )
+        if request.delete:
+            temp_file = lback_temp_file()
+            shutil.move( lback_backup_path( full_id ), temp_file.name )
+            backup_full_path = temp_file.name
+        if shard:
+            sharded_backup_size = lback_backup_shard_size( request.id, total_shards )
+            shard_start, shard_end = lback_backup_shard_start_end( shard, sharded_backup_size )
+            chunked_file = lback_backup_chunked_file( backup_full_path, chunk_start=shard_start, chunk_end=shard_end, use_backup_path=False)
+        else:
+            chunked_file = lback_backup_chunked_file( backup_full_path, use_backup_path=False )
         for file_chunk_res in iterator:
             lback_output("PACKING RELOCATE BACKUP CHUNK")
             yield shared_pb2.RelocateCmdTakeStatus( raw_data=file_chunk_res, errored=False)

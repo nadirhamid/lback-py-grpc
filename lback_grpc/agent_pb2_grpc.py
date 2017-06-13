@@ -21,6 +21,16 @@ class AgentStub(object):
         request_serializer=shared__pb2.BackupCmdStream.SerializeToString,
         response_deserializer=shared__pb2.BackupCmdStatus.FromString,
         )
+    self.DoBackupAcceptFull = channel.unary_unary(
+        '/lbackgrpc.Agent/DoBackupAcceptFull',
+        request_serializer=shared__pb2.BackupCmdAcceptFull.SerializeToString,
+        response_deserializer=shared__pb2.BackupCmdAcceptStatus.FromString,
+        )
+    self.DoBackupAcceptDiff = channel.stream_unary(
+        '/lbackgrpc.Agent/DoBackupAcceptDiff',
+        request_serializer=shared__pb2.BackupCmdAcceptDiff.SerializeToString,
+        response_deserializer=shared__pb2.BackupCmdAcceptStatus.FromString,
+        )
     self.DoShardedBackup = channel.stream_unary(
         '/lbackgrpc.Agent/DoShardedBackup',
         request_serializer=shared__pb2.BackupCmdStream.SerializeToString,
@@ -67,6 +77,16 @@ class AgentServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def DoBackupAcceptFull(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def DoBackupAcceptDiff(self, request_iterator, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
   def DoShardedBackup(self, request_iterator, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -109,6 +129,16 @@ def add_AgentServicer_to_server(servicer, server):
           servicer.DoBackup,
           request_deserializer=shared__pb2.BackupCmdStream.FromString,
           response_serializer=shared__pb2.BackupCmdStatus.SerializeToString,
+      ),
+      'DoBackupAcceptFull': grpc.unary_unary_rpc_method_handler(
+          servicer.DoBackupAcceptFull,
+          request_deserializer=shared__pb2.BackupCmdAcceptFull.FromString,
+          response_serializer=shared__pb2.BackupCmdAcceptStatus.SerializeToString,
+      ),
+      'DoBackupAcceptDiff': grpc.stream_unary_rpc_method_handler(
+          servicer.DoBackupAcceptDiff,
+          request_deserializer=shared__pb2.BackupCmdAcceptDiff.FromString,
+          response_serializer=shared__pb2.BackupCmdAcceptStatus.SerializeToString,
       ),
       'DoShardedBackup': grpc.stream_unary_rpc_method_handler(
           servicer.DoShardedBackup,

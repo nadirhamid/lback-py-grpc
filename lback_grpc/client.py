@@ -18,12 +18,13 @@ class Client( object ):
     def __init__(self):
         self.server = server_connection()
     def _run_backup( self, operation_instance, backup ):
-        lback_output("Routing BACKUP")
-        lback_output("Creating TEMP backup snapshot")
-        temp_backup_id = lback_make_temp_backup( backup )
         msg = shared_pb2.BackupCmd(
            id=backup.id,
-           temp_id=temp_backup_id )
+           target=operation_instance.args.target,
+           folder=operation_instance.args.folder,
+           encryption_key=operation_instance.args.encryption_key,
+           diff=operation_instance.args.diff,
+           distribution_strategy=operation_instance.args.distribution_strategy )
         replies = self.server.RouteBackup( msg )
         for reply in replies:
            if not reply.errored:
