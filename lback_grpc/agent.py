@@ -49,7 +49,9 @@ class Agent(agent_pb2_grpc.AgentServicer):
         print_exc(ex)
         return shared_pb2.BackupCmdAcceptStatus(
             errored=True)
+    backup_size = os.stat( bkp.get_file() ).st_size
     return shared_pb2.BackupCmdAcceptStatus(
+            backup_size=backup_size,
             errored=False)
 
 
@@ -77,7 +79,9 @@ class Agent(agent_pb2_grpc.AgentServicer):
     except Exception,ex:
         return shared_pb2.BackupCmdAcceptStatus(
             errored=True)
+    backup_size = os.stat( bkp.get_file() ).st_size
     return shared_pb2.BackupCmdAcceptStatus(
+            backup_size=backup_size,
             errored=False)
      
   def DoRelocateTake(self, request, context):
@@ -87,6 +91,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
     full_id = lback_id(request.id, shard=shard)
     lback_output("FULL ID %s"%( full_id ) )
     backup_full_path = lback_backup_path( full_id )
+    shard_size = None
 
     try:
         if request.delete:
@@ -94,14 +99,16 @@ class Agent(agent_pb2_grpc.AgentServicer):
             shutil.move( lback_backup_path( full_id ), temp_file.name )
             backup_full_path = temp_file.name
         if not shard is None:
-            sharded_backup_size = lback_backup_shard_size( request.id, total_shards )
-            shard_start, shard_end = lback_backup_shard_start_end( shard, sharded_backup_size )
+            shard_size = lback_backup_shard_size( request.id, int( request.total_shards ) )
+            shard_start, shard_end = lback_backup_shard_start_end( int( shard ), shard_size )
             iterator = lback_backup_chunked_file( backup_full_path, chunk_start=shard_start, chunk_end=shard_end, use_backup_path=False)
         else:
             iterator = lback_backup_chunked_file( backup_full_path, use_backup_path=False )
         for file_chunk_res in iterator:
             lback_output("PACKING RELOCATE BACKUP CHUNK")
-            yield shared_pb2.RelocateCmdTakeStatus( raw_data=file_chunk_res, errored=False)
+            yield shared_pb2.RelocateCmdTakeStatus( 
+                raw_data=file_chunk_res, 
+                errored=False)
     except Exception,ex:
         print_exc(ex)
         yield shared_pb2.RelocateCmdTakeStatus( errored=True )
