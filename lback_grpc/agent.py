@@ -45,8 +45,12 @@ class Agent(agent_pb2_grpc.AgentServicer):
           shutil.rmtree(folder)
           lback_output("Directory successfully deleted..")
     except Exception,ex:
-        return shared_pb2.BackupAcceptStatus(
+        print_exc(ex)
+        return shared_pb2.BackupCmdAcceptStatus(
             errored=True)
+    return shared_pb2.BackupCmdAcceptStatus(
+            errored=False)
+
 
   def DoBackupAcceptDiff(self, request_iterator, context):
     lback_output("Received COMMAND DoBackupAcceptDiff")
@@ -63,9 +67,9 @@ class Agent(agent_pb2_grpc.AgentServicer):
         restore.run_chunked(chunked_restore_iterator()) 
         bkp.run_diff(restore_path)  
     except Exception,ex:
-        return shared_pb2.BackupAcceptStatus(
+        return shared_pb2.BackupCmdAcceptStatus(
             errored=True)
-    return shared_pb2.BackupAcceptStatus(
+    return shared_pb2.BackupCmdAcceptStatus(
             errored=False)
      
   def DoRelocateTake(self, request, context):
