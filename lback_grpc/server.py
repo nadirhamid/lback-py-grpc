@@ -26,6 +26,9 @@ def cmd_response_handler(cmd_response):
        return shared_pb2.BackupCmdStatus(errored=True)
    return cmd_response
 
+def verify_errored(resp):
+   pass
+
 
 class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
   def __init__(self):
@@ -182,7 +185,7 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
         if did_backup[ 0 ]:
             return
         if not diff:
-            backup_res = agent.DoBackupAcceptFull( shared_pb2.BackupAcceptCmd(
+            backup_res = agent[1].DoBackupAcceptFull( shared_pb2.BackupCmdAcceptFull(
                  id=id,
                  folder=folder,
                  encryption_key=encryption_key) )
@@ -199,13 +202,13 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
                 skip_run=True), None)
             verify_errored( restore_res )
             restore_backup_file = lback_backup_chunked_file(lback_id(id, suffix="R"))
-            backup_res = agent.DoBackupAccept(diff_restore_iterator())
+            backup_res = agent[1].DoBackupAccept(diff_restore_iterator())
         verify_errored( backup_res )
         did_backup[ 0 ] = True
 
     def do_backup_and_fetch_chunks(take_shard=None):
         do_backup()
-        return agent.DoRelocateTake( shared_pb2.RelocateCmdTake(
+        return agent[1].DoRelocateTake( shared_pb2.RelocateCmdTake(
             id=id,
             folder=folder,
             shard=take_shard,

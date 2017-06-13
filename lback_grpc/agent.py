@@ -34,8 +34,9 @@ class Agent(agent_pb2_grpc.AgentServicer):
 
   def DoBackupAcceptFull(self, request, context):
     lback_output("Received COMMAND DoBackupAcceptFull")
-    folder = args.folder
-    bkp = Backup(id, folder, diff=args.diff, encryption_key=args.encryption_key)
+    folder = request.folder
+    id = request.id
+    bkp = Backup(id, folder, diff=False, encryption_key=request.encryption_key)
 
     try:
         lback_output("RUNNING FULL BACKUP")
@@ -51,8 +52,8 @@ class Agent(agent_pb2_grpc.AgentServicer):
     lback_output("Received COMMAND DoBackupAcceptDiff")
     request_iterator, iter_copy = tee( request_iterator )
     request = next(iter_copy)
-    folder = args.folder
-    bkp = Backup(id, folder, diff=args.diff, encryption_key=args.encryption_key)
+    folder = request.folder
+    bkp = Backup(id, folder, diff=True, encryption_key=request.encryption_key)
     restore_path = lback_temp_path()
     def chunked_restore_iterator():
         for res in request_iterator:
