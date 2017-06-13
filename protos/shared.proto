@@ -45,14 +45,15 @@ message BackupCmd {
   string target = 3; 
   string encryption_key = 4;
   string distribution_strategy = 5;
-  bool diff = 6;
+  string diff = 6;
   bool remove = 7;
   repeated string agent_ids = 8;
 }
 
 message BackupCmdStatus {
   int32 elapsed_time = 1;
-  bool errored = 2;
+  float backup_size = 2;
+  bool errored = 3;
 }
 
 message BackupCmdAcceptFull {

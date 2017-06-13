@@ -1,5 +1,5 @@
 from lback.backup import Backup
-from lback.utils import lback_backup, lback_backup_chunked_file, lback_backup_remove, lback_output, lback_backup_path, lback_id, lback_temp_file, lback_backup_shard_size, lback_backup_shard_start_end
+from lback.utils import lback_backup, lback_backup_chunked_file, lback_backup_remove, lback_output, lback_backup_path, lback_id, lback_temp_file, lback_backup_shard_size, lback_backup_shard_start_end, lback_temp_path
 from lback.restore import Restore
 from . import agent_pb2
 from . import agent_pb2_grpc
@@ -34,12 +34,13 @@ class Agent(agent_pb2_grpc.AgentServicer):
 
   def DoBackupAcceptFull(self, request, context):
     lback_output("Received COMMAND DoBackupAcceptFull")
+    lback_output("ID %s"%( request.id ) )
     folder = request.folder
     id = request.id
     bkp = Backup(id, folder, diff=False, encryption_key=request.encryption_key)
 
     try:
-        lback_output("RUNNING FULL BACKUP")
+        lback_output("RUNNING FULL BACKUP AT %s" % ( bkp.get_file() ))
         bkp.run()
         if request.remove:
           shutil.rmtree(folder)
@@ -56,16 +57,23 @@ class Agent(agent_pb2_grpc.AgentServicer):
     lback_output("Received COMMAND DoBackupAcceptDiff")
     request_iterator, iter_copy = tee( request_iterator )
     request = next(iter_copy)
+    id = request.id
     folder = request.folder
+    lback_output("ID %s"%( request.id ) )
+
     bkp = Backup(id, folder, diff=True, encryption_key=request.encryption_key)
-    restore_path = lback_temp_path()
     def chunked_restore_iterator():
         for res in request_iterator:
             yield res.raw_data
     try:
-        restore = Restore(id, request.folder)
+        restore_path = lback_temp_path()
+        os.makedirs( restore_path )
+        lback_output("Running DIFF RESTORE")
+        restore = Restore(id, folder=restore_path)
         restore.run_chunked(chunked_restore_iterator()) 
+        lback_output("Running DIFF BACKUP")
         bkp.run_diff(restore_path)  
+        os.remove( restore_path )
     except Exception,ex:
         return shared_pb2.BackupCmdAcceptStatus(
             errored=True)
@@ -77,13 +85,15 @@ class Agent(agent_pb2_grpc.AgentServicer):
     lback_output("ID %s, SHARD %s"%( request.id, request.shard, ) )
     shard = protobuf_empty_to_none(request.shard)
     full_id = lback_id(request.id, shard=shard)
+    lback_output("FULL ID %s"%( full_id ) )
     backup_full_path = lback_backup_path( full_id )
+
     try:
         if request.delete:
             temp_file = lback_temp_file()
             shutil.move( lback_backup_path( full_id ), temp_file.name )
             backup_full_path = temp_file.name
-        if shard:
+        if not shard is None:
             sharded_backup_size = lback_backup_shard_size( request.id, total_shards )
             shard_start, shard_end = lback_backup_shard_start_end( shard, sharded_backup_size )
             iterator = lback_backup_chunked_file( backup_full_path, chunk_start=shard_start, chunk_end=shard_end, use_backup_path=False)

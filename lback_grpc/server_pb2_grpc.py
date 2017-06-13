@@ -16,7 +16,7 @@ class ServerStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.RouteBackup = channel.unary_stream(
+    self.RouteBackup = channel.unary_unary(
         '/lbackgrpc.Server/RouteBackup',
         request_serializer=shared__pb2.BackupCmd.SerializeToString,
         response_deserializer=shared__pb2.BackupCmdStatus.FromString,
@@ -70,7 +70,7 @@ class ServerServicer(object):
 
 def add_ServerServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'RouteBackup': grpc.unary_stream_rpc_method_handler(
+      'RouteBackup': grpc.unary_unary_rpc_method_handler(
           servicer.RouteBackup,
           request_deserializer=shared__pb2.BackupCmd.FromString,
           response_serializer=shared__pb2.BackupCmdStatus.SerializeToString,
