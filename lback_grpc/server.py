@@ -163,7 +163,7 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
             return  agent[1].DoRelocateTake( shared_pb2.RelocateCmdTake( 
                 id=id,
                 folder=folder,
-                shard=sharded_iterator.get_count_as_string(),
+                shard_iterator=sharded_iterator.get_count_as_string(),
                 total_shards=sharded_iterator.get_total_as_string()))
      return self.RouteOnAgent( agent, route_take_fn )
 

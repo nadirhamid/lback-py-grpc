@@ -52,9 +52,8 @@ message BackupCmd {
 
 message BackupCmdStatus {
   int32 elapsed_time = 1;
-  float backup_size = 2;
-  int32 total_shards = 3;
-  bool errored = 4;
+  int32 total_shards = 2;
+  bool errored = 3;
 }
 
 message BackupCmdAcceptFull {
@@ -117,8 +116,9 @@ message RelocateCmdTake {
   string id = 1;
   string folder = 2;
   string shard = 3;
-  string total_shards = 4;
-  bool delete = 5;
+  string shard_iterator = 4;
+  string total_shards = 5;
+  bool delete = 6;
 }
 
 message RelocateCmdGiveStream {

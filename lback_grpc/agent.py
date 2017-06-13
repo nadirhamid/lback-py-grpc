@@ -88,6 +88,8 @@ class Agent(agent_pb2_grpc.AgentServicer):
     lback_output("Received COMMAND DoRelocateTake")
     lback_output("ID %s, SHARD %s"%( request.id, request.shard, ) )
     shard = protobuf_empty_to_none(request.shard)
+    shard_iterator = protobuf_empty_to_none(request.shard_iterator)
+    lback_output("SHARD ITERATOR: %s"%( shard_iterator ) )
     full_id = lback_id(request.id, shard=shard)
     lback_output("FULL ID %s"%( full_id ) )
     backup_full_path = lback_backup_path( full_id )
@@ -98,9 +100,10 @@ class Agent(agent_pb2_grpc.AgentServicer):
             temp_file = lback_temp_file()
             shutil.move( lback_backup_path( full_id ), temp_file.name )
             backup_full_path = temp_file.name
-        if not shard is None:
-            shard_size = lback_backup_shard_size( request.id, int( request.total_shards ) )
-            shard_start, shard_end = lback_backup_shard_start_end( int( shard ), shard_size )
+        backup_size = os.stat( backup_full_path ).st_size
+        if not shard_iterator is None:
+            shard_size = lback_backup_shard_size( backup_size, int( request.total_shards ) )
+            shard_start, shard_end = lback_backup_shard_start_end( int( shard_iterator ), shard_size )
             iterator = lback_backup_chunked_file( backup_full_path, chunk_start=shard_start, chunk_end=shard_end, use_backup_path=False)
         else:
             iterator = lback_backup_chunked_file( backup_full_path, use_backup_path=False )
