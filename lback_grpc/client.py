@@ -21,10 +21,11 @@ class Client( object ):
         msg = shared_pb2.BackupCmd(
            id=backup.id,
            target=operation_instance.args.target,
-           folder=operation_instance.args.folder,
+           folder=backup.folder,
            encryption_key=operation_instance.args.encryption_key,
            diff=operation_instance.args.diff,
-           distribution_strategy=operation_instance.args.distribution_strategy )
+           distribution_strategy=operation_instance.args.distribution_strategy,
+           remove=operation_instance.args.remove )
         replies = self.server.RouteBackup( msg )
         for reply in replies:
            if not reply.errored:

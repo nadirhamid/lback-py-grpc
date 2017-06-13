@@ -41,12 +41,13 @@ message BackupCmdStream {
 message BackupCmd {
   // The location from which the message is sent.
   string id = 1;
-  repeated string folder = 2;
+  string folder = 2;
   string target = 3; 
   string encryption_key = 4;
   string distribution_strategy = 5;
   bool diff = 6;
-  repeated string agent_ids = 7;
+  bool remove = 7;
+  repeated string agent_ids = 8;
 }
 
 message BackupCmdStatus {
@@ -58,6 +59,7 @@ message BackupCmdAcceptFull {
   string id = 1;
   string folder = 2;
   string encryption_key = 3;
+  bool remove = 4;
 }
 
 message BackupCmdAcceptDiff {
@@ -65,6 +67,7 @@ message BackupCmdAcceptDiff {
   string folder = 2;
   string encryption_key = 3;
   bytes  raw_data = 4;
+  bool remove = 5;
 }
 
 message BackupCmdAcceptStatus {

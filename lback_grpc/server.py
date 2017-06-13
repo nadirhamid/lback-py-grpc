@@ -12,7 +12,7 @@ from .sharded_iterator import ShardedIterator
 from .agent_server_object import AgentServerObject
 from traceback import print_exc
 
-from lback.utils import lback_agents, lback_backup_chunked_file, lback_output, lback_backup, lback_agent_is_available, lback_backup_shard_size, lback_backup_shard_start_end, lback_backup_remove
+from lback.utils import lback_agents, lback_backup_chunked_file, lback_output, lback_backup, lback_agent_is_available, lback_backup_shard_size, lback_backup_shard_start_end, lback_backup_remove, lback_temp_to_chunks
 from lback.backup import BackupObject
 from lback.restore import Restore
 
@@ -172,23 +172,31 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
     lback_output("Received COMMAND RouteBackup")
     agents = self.FetchAllAgentsByIds( request.agent_ids )
     id = request.id
-    folders = request.folder
+    folder = request.folder
     encryption_key = request.encryption_key
     distribution_strategy = request.distribution_strategy
     diff = request.diff
     did_backup = [ False ]
-    folder = None
     agent = self.FetchAgentById( request.target )
     if not len( request.agent_ids ) > 0:
        agents = self.FetchEveryAgentPossible()
+    lback_output("DIFF: %s, ENCRYPTION KEY: %s, DISTRIBUTION STRATEGY: %s, TARGET: %s"%( 
+            diff,
+            encryption_key,
+            distribution_strategy,
+            request.target,))
     def do_backup():
         if did_backup[ 0 ]:
             return
-        if not diff:
-            backup_res = agent[1].DoBackupAcceptFull( shared_pb2.BackupCmdAcceptFull(
+        lback_output("Routing BackupCmdAccept")
+        def route_full_fn(agent):
+            return agent[1].DoBackupAcceptFull( shared_pb2.BackupCmdAcceptFull(
                  id=id,
                  folder=folder,
                  encryption_key=encryption_key) )
+
+        if not diff:
+            backup_res = self.RouteOnAgent(agent, route_full_fn)
         else:
             def diff_restore_iterator():
                 for chunk in restore_backup_file:
@@ -204,20 +212,26 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
             restore_backup_file = lback_backup_chunked_file(lback_id(id, suffix="R"))
             backup_res = agent[1].DoBackupAccept(diff_restore_iterator())
         verify_errored( backup_res )
+        lback_output("Completed BackupCmdAccept")
         did_backup[ 0 ] = True
 
     def do_backup_and_fetch_chunks(take_shard=None):
         do_backup()
-        return agent[1].DoRelocateTake( shared_pb2.RelocateCmdTake(
+        chunks = agent[1].DoRelocateTake( shared_pb2.RelocateCmdTake(
             id=id,
             folder=folder,
             shard=take_shard,
             delete=False) )
+        def chunked_iterator():
+            for chunk in chunks:
+                yield chunk.raw_data
+        return lback_temp_to_chunks(chunked_iterator())
+       
     def do_shared_distribution():
         lback_output("Backup with DISTRIBUTION STRATEGY shared")
+        chunked_file = do_backup_and_fetch_chunks()
         def chunked_iterator(agent):
            lback_output("Ready to pack CHUNKS for backup %s"%request.id)
-           chunked_file = do_backup_and_fetch_chunks()
            for backup_file_chunk in chunked_file:
               lback_output("Packing CHUNK")
               yield shared_pb2.BackupCmdStream( id=id,folder=folder,raw_data=backup_file_chunk )
@@ -265,17 +279,15 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
         sharded_backup_size = lback_backup_shard_size( request.temp_id, total_shards )
         for cmd_response in self.RouteToTheseAgents( agents_possible, route_fn ):
             yield cmd_response_handler(cmd_response)
-    for folder_name in folders:
-        folder = folder_name
-        lback_output("ROUTING BACKUP FOR FOLDER %s"%( folder ) )
-        if distribution_strategy=="sharded":
-            iterator = do_sharded_distribution()
-        elif distribution_strategy=="shared":
-            iterator = do_shared_distribution()
-        for cmd_response in iterator:
-            yield cmd_response
-    lback_output("REMOVING TEMP BACKUP")
-    lback_backup_remove(request.temp_id)
+   
+    lback_output("ROUTING BACKUP FOR FOLDER %s"%( folder ) )
+    lback_output("ROUTING BACKUP FOR FOLDER %s"%( folder ) )
+    if distribution_strategy=="sharded":
+        iterator = do_sharded_distribution()
+    elif distribution_strategy=="shared":
+        iterator = do_shared_distribution()
+    for cmd_response in iterator:
+        yield cmd_response
 
   @WithLock
   def RouteRelocate(self, request, context):  

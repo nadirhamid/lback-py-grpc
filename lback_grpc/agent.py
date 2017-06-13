@@ -41,7 +41,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
     try:
         lback_output("RUNNING FULL BACKUP")
         bkp.run()
-        if args.remove:
+        if request.remove:
           shutil.rmtree(folder)
           lback_output("Directory successfully deleted..")
     except Exception,ex:
@@ -86,9 +86,9 @@ class Agent(agent_pb2_grpc.AgentServicer):
         if shard:
             sharded_backup_size = lback_backup_shard_size( request.id, total_shards )
             shard_start, shard_end = lback_backup_shard_start_end( shard, sharded_backup_size )
-            chunked_file = lback_backup_chunked_file( backup_full_path, chunk_start=shard_start, chunk_end=shard_end, use_backup_path=False)
+            iterator = lback_backup_chunked_file( backup_full_path, chunk_start=shard_start, chunk_end=shard_end, use_backup_path=False)
         else:
-            chunked_file = lback_backup_chunked_file( backup_full_path, use_backup_path=False )
+            iterator = lback_backup_chunked_file( backup_full_path, use_backup_path=False )
         for file_chunk_res in iterator:
             lback_output("PACKING RELOCATE BACKUP CHUNK")
             yield shared_pb2.RelocateCmdTakeStatus( raw_data=file_chunk_res, errored=False)
