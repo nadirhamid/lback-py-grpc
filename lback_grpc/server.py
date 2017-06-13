@@ -1,5 +1,6 @@
 import grpc 
 import os
+import time
 from . import make_connection_string, safe_rpc
 from  . import agent_pb2_grpc
 from . import server_pb2
@@ -13,8 +14,8 @@ from .sharded_iterator import ShardedIterator
 from .agent_server_object import AgentServerObject
 from traceback import print_exc
 
-from lback.utils import lback_agents, lback_backup_chunked_file, lback_output, lback_backup, lback_agent_is_available, lback_backup_shard_size, lback_backup_shard_start_end, lback_backup_remove, lback_temp_from_chunks, lback_temp_path
-from lback.backup import BackupObject
+from lback.utils import lback_agents, lback_backup_chunked_file, lback_output, lback_backup, lback_agent_is_available, lback_backup_shard_size, lback_backup_shard_start_end, lback_backup_remove, lback_temp_from_chunks, lback_temp_path, lback_db
+from lback.backup import BackupObject, Backup
 from lback.restore import Restore
 
 def do_distribution_switch_yield( distribution_strategy, **kwargs ):
@@ -179,9 +180,11 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
     folder = request.folder
     encryption_key = request.encryption_key
     distribution_strategy = request.distribution_strategy
+    name = request.name
     diff = protobuf_empty_to_none( request.diff )
     relocate_temp_file = [ None ]
     diff_temp_file = [ None ]
+    backup_size = [ None ]
     sharded_iterator = ShardedIterator()
     agent = self.FetchAgentById( request.target )
     if not len( request.agent_ids ) > 0:
@@ -192,6 +195,25 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
             encryption_key,
             distribution_strategy,
             request.target,))
+
+    def complete_backup_and_cleanup():
+        db = lback_db()
+        dirname = os.path.dirname( folder )
+        bkp = Backup(id, folder, diff=diff, encryption_key=encryption_key)
+        size = os.stat( relocate_temp_file[ 0 ].name ).st_size
+        total_shards = sharded_iterator.get_total()
+        bkp_type = "full"
+        if diff:
+            bkp_type = "diff"
+        insert_cursor = db.cursor().execute("INSERT INTO backups (id, time, folder, dirname, size, backup_type, name, encryption_key, distribution_strategy, shards_total) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+          (id, time.time(), folder, dirname, size, bkp_type, name, encryption_key, distribution_strategy, total_shards, ))
+        db.commit()
+        rm_result = self.RouteRm(shared_pb2.RmCmd(
+            id=id,
+            target=request.target), None)
+        if rm_result.errored:
+           raise Exception("Could not remove backup")
+
     def do_backup_and_fetch_chunks():
         def do_first_relocate(chunks):
             lback_output("DOING FIRST RELOCATE")
@@ -272,8 +294,8 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
 
         def chunked_iterator(agent):
            lback_output("Ready to pack shared CHUNKS for backup %s"%request.id)
-          
-           chunked_file = do_backup_and_fetch_chunks()
+           chunked_file = lback_backup_chunked_file( relocate_temp_file[0].name, use_backup_path=False )
+
            for backup_file_chunk in chunked_file:
               lback_output("Packing CHUNK")
               yield shared_pb2.BackupCmdStream( id=request.id,raw_data=backup_file_chunk, shard=sharded_iterator.get_count_as_string()  )
@@ -294,18 +316,22 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
 
         for cmd_response in self.RouteToTheseAgents( agents_possible, route_fn ):
             yield cmd_response_handler(cmd_response)
-   
-    lback_output("ROUTING BACKUP FOR FOLDER %s"%( folder ) )
-    lback_output("ROUTING BACKUP FOR FOLDER %s"%( folder ) )
-    if distribution_strategy=="sharded":
-        iterator = do_sharded_distribution()
-    elif distribution_strategy=="shared":
-        iterator = do_shared_distribution()
-    for cmd_reply in iterator:
-        if cmd_reply.errored:
-            return shared_pb2.BackupCmdStatus( errored=True )
-    backup_size = os.stat( relocate_temp_file[ 0 ].name ).st_size 
-    return shared_pb2.BackupCmdStatus( errored=False, backup_size=backup_size, total_shards= total_shards[ 0 ] )
+  
+    try: 
+        lback_output("ROUTING BACKUP FOR FOLDER %s"%( folder ) )
+        lback_output("ROUTING BACKUP FOR FOLDER %s"%( folder ) )
+        if distribution_strategy=="sharded":
+            iterator = do_sharded_distribution()
+        elif distribution_strategy=="shared":
+            iterator = do_shared_distribution()
+        for cmd_reply in iterator:
+            if cmd_reply.errored:
+                return shared_pb2.BackupCmdStatus( errored=True )
+        complete_backup_and_cleanup()
+    except Exception,ex:
+       print_exc(ex) 
+       return shared_pb2.BackupCmdStatus( errored=True )
+    return shared_pb2.BackupCmdStatus( errored=False )
       
     
 
@@ -424,18 +450,17 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
       target = request.target
       id = request.id
       db_backup = lback_backup(id)
+      if target:
+         agents = [self.FetchAgentById(target)]
+      else: 
+         agents = self.FetchAllPossibleAgents()
       def do_shared_rm():
           lback_output("Remove with DISTRIBUTION STRATEGY shared")
           def route_fn(agent):
               status = agent[1].DoRm(request)
               return status
-          iterator = self.RouteOnAllAgents( route_fn )
-          for rm_cmd_reply in iterator:
-             if rm_cmd_reply is None:
-                yield shared_pb2.RmCmdStatus(errored=True)
-             else:
-                lback_output("COMPLETED REMOVE")
-                yield rm_cmd_reply
+          iterator = self.RouteToTheseAgents(agents, route_fn)
+          return iterator
       def do_sharded_rm():
           lback_output("Remove with DISTRIBUTION STRATEGY sharded")
           shard_count = [ 0 ]
@@ -447,26 +472,14 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
               status = agent[1].DoRm(rm_cmd)
               return status
           iterator = self.RouteWithShard(shard_count[ 0 ], shard_total, db_backup, route_fn)
-          for rm_cmd_reply in iterator:
-             if not rm_cmd_reply:
-                yield shared_pb2.RmCmdStatus(errored=True)
-             else:
-                lback_output("COMPLETED REMOVE")
-                yield rm_cmd_reply
-      def handle_all_rm():
-          if db_backup.distribution_strategy=="shared":
-             iterator = do_shared_rm()
-          elif db_backup.distribution_strategy=="sharded":
-             iterator = do_sharded_rm()
-          for cmd_result in iterator:
-             if cmd_result.errored:
-                yield cmd_result
-          yield shared_pb2.RmCmdStatus( errored=False )
-      def handle_target_rm():
-          lback_output("NOT IMPLEMENTED")
-          yield shared_pb2.RmCmdStatus(errored=True)
-      iterator = handle_all_rm()
-      if not all:
-          iterator = handle_target_rm()
-      for cmd_result in iterator:
-           yield cmd_result
+          return iterator
+      if db_backup.distribution_strategy=="shared":
+         iterator = do_shared_rm()
+      elif db_backup.distribution_strategy=="sharded":
+         iterator = do_sharded_rm()
+      for res in iterator:
+         if res.errored:
+            return shared_pb2.RmCmdStatus(
+                errored=True)
+      return shared_pb2.RmCmdStatus(
+            errored=False)

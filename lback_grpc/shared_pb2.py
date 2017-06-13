@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='shared.proto',
   package='lbackgrpc',
   syntax='proto3',
-  serialized_pb=_b('\n\x0cshared.proto\x12\tlbackgrpc\"N\n\x0f\x42\x61\x63kupCmdStream\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\r\n\x05shard\x18\x03 \x01(\t\x12\x0e\n\x06\x66older\x18\x04 \x01(\t\"\x9f\x01\n\tBackupCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x0e\n\x06target\x18\x03 \x01(\t\x12\x16\n\x0e\x65ncryption_key\x18\x04 \x01(\t\x12\x1d\n\x15\x64istribution_strategy\x18\x05 \x01(\t\x12\x0c\n\x04\x64iff\x18\x06 \x01(\t\x12\x0e\n\x06remove\x18\x07 \x01(\x08\x12\x11\n\tagent_ids\x18\x08 \x03(\t\"N\n\x0f\x42\x61\x63kupCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x14\n\x0ctotal_shards\x18\x02 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x03 \x01(\x08\"Y\n\x13\x42\x61\x63kupCmdAcceptFull\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x16\n\x0e\x65ncryption_key\x18\x03 \x01(\t\x12\x0e\n\x06remove\x18\x04 \x01(\x08\"k\n\x13\x42\x61\x63kupCmdAcceptDiff\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x16\n\x0e\x65ncryption_key\x18\x03 \x01(\t\x12\x10\n\x08raw_data\x18\x04 \x01(\x0c\x12\x0e\n\x06remove\x18\x05 \x01(\x08\"S\n\x15\x42\x61\x63kupCmdAcceptStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x13\n\x0b\x62\x61\x63kup_size\x18\x02 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x03 \x01(\x08\"r\n\nRestoreCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x17\n\x0fuse_temp_folder\x18\x03 \x01(\x08\x12\r\n\x05shard\x18\x04 \x01(\t\x12\x10\n\x08skip_run\x18\x05 \x01(\x08\x12\x0e\n\x06target\x18\x06 \x01(\t\"K\n\x10RestoreCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\x0f\n\x07\x65rrored\x18\x03 \x01(\x08\"@\n\x10RestoreAcceptCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\x0e\n\x06\x66older\x18\x03 \x01(\t\"?\n\x16RestoreAcceptCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"B\n\x0bRelocateCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0b\n\x03src\x18\x02 \x01(\t\x12\x0b\n\x03\x64st\x18\x03 \x01(\t\x12\r\n\x05shard\x18\x04 \x01(\t\"z\n\x0fRelocateCmdTake\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\r\n\x05shard\x18\x03 \x01(\t\x12\x16\n\x0eshard_iterator\x18\x04 \x01(\t\x12\x14\n\x0ctotal_shards\x18\x05 \x01(\t\x12\x0e\n\x06\x64\x65lete\x18\x06 \x01(\x08\"T\n\x15RelocateCmdGiveStream\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x10\n\x08raw_data\x18\x03 \x01(\x0c\x12\r\n\x05shard\x18\x04 \x01(\t\":\n\x11RelocateCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"P\n\x15RelocateCmdTakeStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\x0f\n\x07\x65rrored\x18\x03 \x01(\x08\"(\n\x15RelocateCmdGiveStatus\x12\x0f\n\x07\x65rrored\x18\x01 \x01(\x08\"?\n\x05RmCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06target\x18\x02 \x01(\t\x12\x0b\n\x03\x61ll\x18\x03 \x01(\x08\x12\r\n\x05shard\x18\x04 \x01(\t\"4\n\x0bRmCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"%\n\x08\x43heckCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\r\n\x05shard\x18\x02 \x01(\t\"!\n\x0e\x43heckCmdStatus\x12\x0f\n\x07\x65rrored\x18\x01 \x01(\x08\x62\x06proto3')
+  serialized_pb=_b('\n\x0cshared.proto\x12\tlbackgrpc\"N\n\x0f\x42\x61\x63kupCmdStream\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\r\n\x05shard\x18\x03 \x01(\t\x12\x0e\n\x06\x66older\x18\x04 \x01(\t\"\xad\x01\n\tBackupCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x0e\n\x06target\x18\x03 \x01(\t\x12\x16\n\x0e\x65ncryption_key\x18\x04 \x01(\t\x12\x1d\n\x15\x64istribution_strategy\x18\x05 \x01(\t\x12\x0c\n\x04\x64iff\x18\x06 \x01(\t\x12\x0c\n\x04name\x18\x07 \x01(\t\x12\x0e\n\x06remove\x18\x08 \x01(\x08\x12\x11\n\tagent_ids\x18\t \x03(\t\"8\n\x0f\x42\x61\x63kupCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"Y\n\x13\x42\x61\x63kupCmdAcceptFull\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x16\n\x0e\x65ncryption_key\x18\x03 \x01(\t\x12\x0e\n\x06remove\x18\x04 \x01(\x08\"k\n\x13\x42\x61\x63kupCmdAcceptDiff\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x16\n\x0e\x65ncryption_key\x18\x03 \x01(\t\x12\x10\n\x08raw_data\x18\x04 \x01(\x0c\x12\x0e\n\x06remove\x18\x05 \x01(\x08\"S\n\x15\x42\x61\x63kupCmdAcceptStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x13\n\x0b\x62\x61\x63kup_size\x18\x02 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x03 \x01(\x08\"r\n\nRestoreCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x17\n\x0fuse_temp_folder\x18\x03 \x01(\x08\x12\r\n\x05shard\x18\x04 \x01(\t\x12\x10\n\x08skip_run\x18\x05 \x01(\x08\x12\x0e\n\x06target\x18\x06 \x01(\t\"K\n\x10RestoreCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\x0f\n\x07\x65rrored\x18\x03 \x01(\x08\"@\n\x10RestoreAcceptCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\x0e\n\x06\x66older\x18\x03 \x01(\t\"?\n\x16RestoreAcceptCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"B\n\x0bRelocateCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0b\n\x03src\x18\x02 \x01(\t\x12\x0b\n\x03\x64st\x18\x03 \x01(\t\x12\r\n\x05shard\x18\x04 \x01(\t\"z\n\x0fRelocateCmdTake\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\r\n\x05shard\x18\x03 \x01(\t\x12\x16\n\x0eshard_iterator\x18\x04 \x01(\t\x12\x14\n\x0ctotal_shards\x18\x05 \x01(\t\x12\x0e\n\x06\x64\x65lete\x18\x06 \x01(\x08\"T\n\x15RelocateCmdGiveStream\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x66older\x18\x02 \x01(\t\x12\x10\n\x08raw_data\x18\x03 \x01(\x0c\x12\r\n\x05shard\x18\x04 \x01(\t\":\n\x11RelocateCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"P\n\x15RelocateCmdTakeStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x10\n\x08raw_data\x18\x02 \x01(\x0c\x12\x0f\n\x07\x65rrored\x18\x03 \x01(\x08\"(\n\x15RelocateCmdGiveStatus\x12\x0f\n\x07\x65rrored\x18\x01 \x01(\x08\"?\n\x05RmCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06target\x18\x02 \x01(\t\x12\x0b\n\x03\x61ll\x18\x03 \x01(\x08\x12\r\n\x05shard\x18\x04 \x01(\t\"4\n\x0bRmCmdStatus\x12\x14\n\x0c\x65lapsed_time\x18\x01 \x01(\x05\x12\x0f\n\x07\x65rrored\x18\x02 \x01(\x08\"%\n\x08\x43heckCmd\x12\n\n\x02id\x18\x01 \x01(\t\x12\r\n\x05shard\x18\x02 \x01(\t\"!\n\x0e\x43heckCmdStatus\x12\x0f\n\x07\x65rrored\x18\x01 \x01(\x08\x62\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -128,15 +128,22 @@ _BACKUPCMD = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='remove', full_name='lbackgrpc.BackupCmd.remove', index=6,
-      number=7, type=8, cpp_type=7, label=1,
+      name='name', full_name='lbackgrpc.BackupCmd.name', index=6,
+      number=7, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='remove', full_name='lbackgrpc.BackupCmd.remove', index=7,
+      number=8, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='agent_ids', full_name='lbackgrpc.BackupCmd.agent_ids', index=7,
-      number=8, type=9, cpp_type=9, label=3,
+      name='agent_ids', full_name='lbackgrpc.BackupCmd.agent_ids', index=8,
+      number=9, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -154,7 +161,7 @@ _BACKUPCMD = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=108,
-  serialized_end=267,
+  serialized_end=281,
 )
 
 
@@ -173,15 +180,8 @@ _BACKUPCMDSTATUS = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='total_shards', full_name='lbackgrpc.BackupCmdStatus.total_shards', index=1,
-      number=2, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='errored', full_name='lbackgrpc.BackupCmdStatus.errored', index=2,
-      number=3, type=8, cpp_type=7, label=1,
+      name='errored', full_name='lbackgrpc.BackupCmdStatus.errored', index=1,
+      number=2, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -198,8 +198,8 @@ _BACKUPCMDSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=269,
-  serialized_end=347,
+  serialized_start=283,
+  serialized_end=339,
 )
 
 
@@ -250,8 +250,8 @@ _BACKUPCMDACCEPTFULL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=349,
-  serialized_end=438,
+  serialized_start=341,
+  serialized_end=430,
 )
 
 
@@ -309,8 +309,8 @@ _BACKUPCMDACCEPTDIFF = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=440,
-  serialized_end=547,
+  serialized_start=432,
+  serialized_end=539,
 )
 
 
@@ -354,8 +354,8 @@ _BACKUPCMDACCEPTSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=549,
-  serialized_end=632,
+  serialized_start=541,
+  serialized_end=624,
 )
 
 
@@ -420,8 +420,8 @@ _RESTORECMD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=634,
-  serialized_end=748,
+  serialized_start=626,
+  serialized_end=740,
 )
 
 
@@ -465,8 +465,8 @@ _RESTORECMDSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=750,
-  serialized_end=825,
+  serialized_start=742,
+  serialized_end=817,
 )
 
 
@@ -510,8 +510,8 @@ _RESTOREACCEPTCMD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=827,
-  serialized_end=891,
+  serialized_start=819,
+  serialized_end=883,
 )
 
 
@@ -548,8 +548,8 @@ _RESTOREACCEPTCMDSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=893,
-  serialized_end=956,
+  serialized_start=885,
+  serialized_end=948,
 )
 
 
@@ -600,8 +600,8 @@ _RELOCATECMD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=958,
-  serialized_end=1024,
+  serialized_start=950,
+  serialized_end=1016,
 )
 
 
@@ -666,8 +666,8 @@ _RELOCATECMDTAKE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1026,
-  serialized_end=1148,
+  serialized_start=1018,
+  serialized_end=1140,
 )
 
 
@@ -718,8 +718,8 @@ _RELOCATECMDGIVESTREAM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1150,
-  serialized_end=1234,
+  serialized_start=1142,
+  serialized_end=1226,
 )
 
 
@@ -756,8 +756,8 @@ _RELOCATECMDSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1236,
-  serialized_end=1294,
+  serialized_start=1228,
+  serialized_end=1286,
 )
 
 
@@ -801,8 +801,8 @@ _RELOCATECMDTAKESTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1296,
-  serialized_end=1376,
+  serialized_start=1288,
+  serialized_end=1368,
 )
 
 
@@ -832,8 +832,8 @@ _RELOCATECMDGIVESTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1378,
-  serialized_end=1418,
+  serialized_start=1370,
+  serialized_end=1410,
 )
 
 
@@ -884,8 +884,8 @@ _RMCMD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1420,
-  serialized_end=1483,
+  serialized_start=1412,
+  serialized_end=1475,
 )
 
 
@@ -922,8 +922,8 @@ _RMCMDSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1485,
-  serialized_end=1537,
+  serialized_start=1477,
+  serialized_end=1529,
 )
 
 
@@ -960,8 +960,8 @@ _CHECKCMD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1539,
-  serialized_end=1576,
+  serialized_start=1531,
+  serialized_end=1568,
 )
 
 
@@ -991,8 +991,8 @@ _CHECKCMDSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1578,
-  serialized_end=1611,
+  serialized_start=1570,
+  serialized_end=1603,
 )
 
 DESCRIPTOR.message_types_by_name['BackupCmdStream'] = _BACKUPCMDSTREAM

@@ -46,14 +46,14 @@ message BackupCmd {
   string encryption_key = 4;
   string distribution_strategy = 5;
   string diff = 6;
-  bool remove = 7;
-  repeated string agent_ids = 8;
+  string name = 7;
+  bool remove = 8;
+  repeated string agent_ids = 9;
 }
 
 message BackupCmdStatus {
   int32 elapsed_time = 1;
-  int32 total_shards = 2;
-  bool errored = 3;
+  bool errored = 2;
 }
 
 message BackupCmdAcceptFull {

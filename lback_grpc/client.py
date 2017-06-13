@@ -25,6 +25,7 @@ class Client( object ):
            encryption_key=operation_instance.args.encryption_key,
            diff=operation_instance.args.diff,
            distribution_strategy=operation_instance.args.distribution_strategy,
+           name=operation_instance.args.name,
            remove=operation_instance.args.remove )
         return self.server.RouteBackup( msg )
     def _run_restore( self, operation_instance, backup ):
