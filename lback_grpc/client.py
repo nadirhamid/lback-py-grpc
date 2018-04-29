@@ -23,6 +23,7 @@ class Client( object ):
            target=operation_instance.args.target,
            folder=backup.folder,
            encryption_key=operation_instance.args.encryption_key,
+           compression=operation_instance.args.compression,
            diff=operation_instance.args.diff,
            distribution_strategy=operation_instance.args.distribution_strategy,
            name=operation_instance.args.name,

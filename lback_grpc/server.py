@@ -179,6 +179,7 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
     id = request.id
     folder = request.folder
     encryption_key = request.encryption_key
+    compression = request.compression
     distribution_strategy = request.distribution_strategy
     name = request.name
     diff = protobuf_empty_to_none( request.diff )
@@ -189,24 +190,25 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
     agent = self.FetchAgentById( request.target )
     if not len( request.agent_ids ) > 0:
        agents = self.FetchEveryAgentPossible()
-    lback_output("ID: %s, DIFF: %s, ENCRYPTION KEY: %s, DISTRIBUTION STRATEGY: %s, TARGET: %s"%( 
+    lback_output("ID: %s, DIFF: %s, ENCRYPTION KEY: %s, COMPRESSION: %s, DISTRIBUTION STRATEGY: %s, TARGET: %s"%( 
             id,
             diff,
             encryption_key,
+            compression,
             distribution_strategy,
             request.target,))
 
     def complete_backup_and_cleanup():
         db = lback_db()
         dirname = os.path.dirname( folder )
-        bkp = Backup(id, folder, diff=diff, encryption_key=encryption_key)
+        bkp = Backup(id, folder, diff=diff, encryption_key=encryption_key, compression=compression)
         size = os.stat( relocate_temp_file[ 0 ].name ).st_size
         total_shards = sharded_iterator.get_total()
         bkp_type = "full"
         if diff:
             bkp_type = "diff"
-        insert_cursor = db.cursor().execute("INSERT INTO backups (id, time, folder, dirname, size, backup_type, name, encryption_key, distribution_strategy, shards_total) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-          (id, time.time(), folder, dirname, size, bkp_type, name, encryption_key, distribution_strategy, total_shards, ))
+        insert_cursor = db.cursor().execute("INSERT INTO backups (id, time, folder, dirname, size, backup_type, name, encryption_key, compression, distribution_strategy, shards_total) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+          (id, time.time(), folder, dirname, size, bkp_type, name, encryption_key, compression, distribution_strategy, total_shards, ))
         db.commit()
         rm_result = self.RouteRm(shared_pb2.RmCmd(
             id=id,
@@ -230,7 +232,8 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
                 return agent[1].DoBackupAcceptFull( shared_pb2.BackupCmdAcceptFull(
                      id=id,
                      folder=folder,
-                     encryption_key=encryption_key) )
+                     encryption_key=encryption_key,
+                     compression=compression) )
             def route_diff_fn(agent):
                 lback_output("Routing DIFF backup")
                 return agent[1].DoBackupAcceptDiff(diff_restore_iterator())
@@ -248,6 +251,7 @@ class Server(server_pb2_grpc.ServerServicer, ServerScheduler):
                             shard=None,
                             folder=folder,
                             encryption_key=encryption_key,
+                            compression=compression,
                             raw_data=chunk)
                 def diff_take_iterator():
                     for chunk in self.TakeBackupFrom(diff, folder, None, agent):

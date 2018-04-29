@@ -44,11 +44,12 @@ message BackupCmd {
   string folder = 2;
   string target = 3; 
   string encryption_key = 4;
-  string distribution_strategy = 5;
-  string diff = 6;
-  string name = 7;
-  bool remove = 8;
-  repeated string agent_ids = 9;
+  string compression = 5;
+  string distribution_strategy = 6;
+  string diff = 7;
+  string name = 8;
+  bool remove = 9;
+  repeated string agent_ids = 10;
 }
 
 message BackupCmdStatus {
@@ -60,15 +61,17 @@ message BackupCmdAcceptFull {
   string id = 1;
   string folder = 2;
   string encryption_key = 3;
-  bool remove = 4;
+  string compression = 4;
+  bool remove = 5;
 }
 
 message BackupCmdAcceptDiff {
   string id = 1;
   string folder = 2;
   string encryption_key = 3;
-  bytes  raw_data = 4;
-  bool remove = 5;
+  string compression = 4;
+  bytes  raw_data = 5;
+  bool remove = 6;
 }
 
 message BackupCmdAcceptStatus {

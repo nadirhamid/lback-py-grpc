@@ -37,7 +37,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
     lback_output("ID %s"%( request.id ) )
     folder = request.folder
     id = request.id
-    bkp = Backup(id, folder, diff=False, encryption_key=request.encryption_key)
+    bkp = Backup(id, folder, diff=False, encryption_key=request.encryption_key, compression=request.compression)
 
     try:
         lback_output("RUNNING FULL BACKUP AT %s" % ( bkp.get_file() ))
@@ -63,7 +63,7 @@ class Agent(agent_pb2_grpc.AgentServicer):
     folder = request.folder
     lback_output("ID %s"%( request.id ) )
 
-    bkp = Backup(id, folder, diff=True, encryption_key=request.encryption_key)
+    bkp = Backup(id, folder, diff=True, encryption_key=request.encryption_key, compression=request.compression)
     def chunked_restore_iterator():
         for res in request_iterator:
             yield res.raw_data
